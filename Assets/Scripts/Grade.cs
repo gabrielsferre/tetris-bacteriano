@@ -22,7 +22,7 @@ public class Grade : MonoBehaviour {
 
     private void Awake()
     {
-        montaGrade();
+        MontaGrade();
     }
 
     private void Start()
@@ -31,7 +31,7 @@ public class Grade : MonoBehaviour {
         Instantiate(peca, transform);
     }
 
-    private void montaGrade()
+    private void MontaGrade()
     {
 
         //define tamanho dos quadrados

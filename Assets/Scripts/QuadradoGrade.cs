@@ -11,13 +11,13 @@ public class QuadradoGrade : MonoBehaviour {
     //peca que quadrado de peca que o preenche
     public QuadradoPeca quadradoPeca = null;
 
-    public void preenche(QuadradoPeca quadrado)
+    public void Preenche(QuadradoPeca quadrado)
     {
         quadradoPeca = quadrado;
         ocupado = true;
     }
 
-    public void esvazia()
+    public void Esvazia()
     {
         if( quadradoPeca != null)
         {

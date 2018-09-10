@@ -17,23 +17,33 @@ public class QuadradoPeca : MonoBehaviour
     }
 
     //checa se o quadrado esta na coluna 'limite'
-    public bool checaLimiteHorizontal(int limite)
+    public bool ChecaLimiteHorizontal(int limite)
     {
         return coluna == limite;
     }
 
     //checa se o quadrado esta no fundo da grade
-    public bool checaLimiteVertical()
+    public bool ChecaLimiteVertical()
     {
         return linha < 0 || linha >= (Grade.linhas - 1);
     }
 
+    //retorna o quanto deve ser adicionado à posição dada para que ela talvez torne-se válida
+    //não checa se a posicão retornada está ocupada por outra peça
+    public int[] ValidaPosicao( int[] posicao )
+    {
+        int[] novaPosicao = new int[2];
+
+        if (novaPosicao[1] < 0) ;
+
+        return novaPosicao;
+    }
+
     //move o quadrado para uma dada posicao da grade
-    public void move(int novaLinha, int novaColuna)
+    public void Move(int novaLinha, int novaColuna)
     {
         linha = novaLinha;
         coluna = novaColuna;
-
         transform.position = grade.quadrados[linha, coluna].transform.position + new Vector3(0, 0, -1);
     }
 }
