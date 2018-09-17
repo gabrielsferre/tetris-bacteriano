@@ -5,9 +5,9 @@ using UnityEngine;
 //Quadrado de uma peca
 public class QuadradoPeca : MonoBehaviour
 {
-    //indices da linha e coluna em que se encontra o quadrado
-    public int linha;
-    public int coluna;
+    //posicao do quadrado na grade
+    //posicao.x é a linha e posicao.y, a coluna
+    public Vector2Int posicao = new Vector2Int();
 
     protected Grade grade;
 
@@ -19,31 +19,30 @@ public class QuadradoPeca : MonoBehaviour
     //checa se o quadrado esta na coluna 'limite'
     public bool ChecaLimiteHorizontal(int limite)
     {
-        return coluna == limite;
+        return posicao.y == limite;
     }
 
     //checa se o quadrado esta no fundo da grade
     public bool ChecaLimiteVertical()
     {
-        return linha < 0 || linha >= (Grade.linhas - 1);
+        return posicao.x < 0 || posicao.x >= (Grade.linhas - 1);
     }
 
     //retorna o quanto deve ser adicionado à posição dada para que ela talvez torne-se válida
     //não checa se a posicão retornada está ocupada por outra peça
-    public int[] ValidaPosicao( int[] posicao )
+    public Vector2Int ValidaPosicao( Vector2Int posicao )
     {
-        int[] novaPosicao = new int[2];
+        Vector2Int novaPosicao = new Vector2Int();
 
-        if (novaPosicao[1] < 0) ;
+        if (novaPosicao.y < 0) ;
 
         return novaPosicao;
     }
 
     //move o quadrado para uma dada posicao da grade
-    public void Move(int novaLinha, int novaColuna)
+    public void Move( Vector2Int novaPosicao)
     {
-        linha = novaLinha;
-        coluna = novaColuna;
-        transform.position = grade.quadrados[linha, coluna].transform.position + new Vector3(0, 0, -1);
+        posicao = novaPosicao;
+        transform.position = grade.quadrados[posicao.x, posicao.y].transform.position + new Vector3(0, 0, -1);
     }
 }

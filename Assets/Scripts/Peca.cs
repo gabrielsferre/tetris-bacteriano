@@ -13,11 +13,11 @@ public class Peca : MonoBehaviour {
     public QuadradoPeca[] quadrados = new QuadradoPeca[4];
 
     //posicao do centro da peca, influencia em como ela vai girar
-    //centro[0] é a linha e centro[1], a coluna
-    public int[] centro = new int[2];
+    //centro.x é a linha e centro.y, a coluna
+    public Vector2Int centro = new Vector2Int();
 
     //linha e coluna de surgimento do centro da peca
-    protected int[] posicaoSurgimento = { 6, 4 };
+    protected Vector2Int posicaoSurgimento = new Vector2Int(6,4);
 
     protected Grade grade;
 
@@ -61,7 +61,7 @@ public class Peca : MonoBehaviour {
     //este método funciona como um tipo de método abstrato para as outras classes de peças
     protected virtual void MontaPeca()
     {
-        print("algo errado em montaPeca");
+        Debug.Log("algo errado em montaPeca");
     }
 
 
@@ -70,7 +70,7 @@ public class Peca : MonoBehaviour {
     {
         foreach( QuadradoPeca quadrado in quadrados )
         {
-            if (grade.quadrados[quadrado.linha, quadrado.coluna].ocupado) return true;
+            if (grade.quadrados[quadrado.posicao.x, quadrado.posicao.y].ocupado) return true;
         }
 
         return false;
@@ -83,13 +83,13 @@ public class Peca : MonoBehaviour {
         if (ChecaLimiteHorizontal(0)) return;
 
         //move quadrados da peca para a esquerda
-        MovePeca(0, -1);
+        MovePeca( new Vector2Int(0, -1) );
 
         //se nova posicao nao colidir
         if (!ChecaColisao()) return;
 
         //se colidir, move tudo de volta
-        MovePeca(0, 1);
+        MovePeca( new Vector2Int(0, 1) );
     }
 
     //move peca para a direita caso possivel
@@ -99,25 +99,24 @@ public class Peca : MonoBehaviour {
         if (ChecaLimiteHorizontal(Grade.colunas - 1)) return;
 
         //move quadrados da peca para a direita
-        MovePeca(0, 1);
+        MovePeca( new Vector2Int(0, 1) );
 
         //se nova posicao nao colidir com outra peca
         if (!ChecaColisao()) return;
 
         //se colidir, move tudo de volta
-        MovePeca(0, -1);
+        MovePeca( new Vector2Int(0, -1) );
     }
 
-    //move a peca i quadrados para direita e j para baixo
-    //i e j podem ser negativos
-    public void MovePeca( int i, int j )
+    //move a peca deslocamento.x quadrados para direita e deslocamento.y para baixo
+    //x e y podem ser negativos
+    public void MovePeca( Vector2Int deslocamento )
     {
         foreach (QuadradoPeca quadrado in quadrados)
         {
-            quadrado.Move(quadrado.linha + i, quadrado.coluna + j);
+            quadrado.Move( quadrado.posicao + deslocamento);
         }
-        centro[0] += i;
-        centro[1] += j;
+        centro += deslocamento;
     }
 
     //checa se algum quadrado da peca esta em alguma borda da lateral da grade
@@ -152,13 +151,13 @@ public class Peca : MonoBehaviour {
         }
 
         //move quadrados da peca para baixo
-        movePeca(1, 0);
+        movePeca( new Vector2Int(1, 0) );
 
         //se nova posicao nao colidir com outra peca
         if (!checaColisao()) return;
 
         //se colidir, move tudo de volta
-        movePeca(-1, 0);
+        movePeca( new Vector2Int(-1, 0) );
 
         apagaPeca();
         **/
@@ -172,7 +171,7 @@ public class Peca : MonoBehaviour {
         foreach( QuadradoPeca quadrado in quadrados )
         {
             //preenche quadrado da grade com quadrado da peça
-            QuadradoGrade quadradoGrade = grade.quadrados[quadrado.linha, quadrado.coluna];
+            QuadradoGrade quadradoGrade = grade.quadrados[quadrado.posicao.x, quadrado.posicao.y];
             quadradoGrade.Preenche( quadrado );
         }
 
@@ -191,7 +190,7 @@ public class Peca : MonoBehaviour {
 
         foreach (QuadradoPeca quadrado in quadrados)
         {
-            max = Mathf.Max(max, quadrado.linha);
+            max = Mathf.Max(max, quadrado.posicao.x);
         }
 
         return max;
@@ -204,7 +203,7 @@ public class Peca : MonoBehaviour {
 
         foreach (QuadradoPeca quadrado in quadrados)
         {
-            max = Mathf.Max(max, quadrado.coluna);
+            max = Mathf.Max(max, quadrado.posicao.y);
         }
 
         return max;
@@ -217,7 +216,7 @@ public class Peca : MonoBehaviour {
 
         foreach (QuadradoPeca quadrado in quadrados)
         {
-            min = Mathf.Min(min, quadrado.coluna);
+            min = Mathf.Min(min, quadrado.posicao.y);
         }
 
         return min;
