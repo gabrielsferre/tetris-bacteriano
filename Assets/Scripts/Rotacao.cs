@@ -31,26 +31,37 @@ public class Rotacao {
         return novaPosicao;
     }
 
-    public static void GiraPeca( int sentido, Peca peca )
+    //gira a peça sem mover o objeto peça
+    //muda apenas o atributo 'posicao' dos quadrados que compõe a peça
+    public static void VirtualGiraPeca( int sentido, Peca peca )
     {
         foreach( QuadradoPeca quadrado in peca.quadrados )
         {
-            Vector2Int novaPosicao = GiraQuadrado(1, peca, quadrado);
-            quadrado.Move(novaPosicao);
+            Vector2Int novaPosicao = GiraQuadrado(sentido, peca, quadrado);
+            quadrado.VirtualMove(novaPosicao);
         }
     }
 
-    //metodo usado especificamente para girar a peca reta
-    public static void GiraPecaReta( int sentido, Peca peca )
+    //gira a peça sem mover o objeto peça
+    //muda apenas o atributo 'posicao' dos quadrados que compõe a peça
+    public static void VirtualGiraPecaReta( int sentido, Peca peca )
     {
         Vector2Int distancia = DistanciaCentro(peca, peca.quadrados[0]); //distancia ao centro do quadrado que é separado do resto da peça pelo centro
 
-        peca.MovePeca( new Vector2Int(-distancia.x, -distancia.y) );
+        //sentido horário
+        if (sentido > 0)
+        {
+            peca.VirtualMovePeca(new Vector2Int(-distancia.x, -distancia.y));
+        }
+        else
+        {
+            peca.VirtualMovePeca(new Vector2Int(-distancia.y, distancia.x));
+        }
 
         foreach (QuadradoPeca quadrado in peca.quadrados)
         {
-            Vector2Int novaPosicao = GiraQuadrado(1, peca, quadrado);
-            quadrado.Move(novaPosicao);
+            Vector2Int novaPosicao = GiraQuadrado(sentido, peca, quadrado);
+            quadrado.VirtualMove(novaPosicao);
         }
     }
 }

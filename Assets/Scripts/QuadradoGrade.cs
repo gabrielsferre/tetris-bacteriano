@@ -2,19 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//enum usado para dizer se o espaço está sendo ocupado por uma peça, uma bactéria, ou se está livre
+public enum Preenchimento
+{
+    Peca,
+    Bacteria,
+    Livre
+};
+
 //Quadrado da grade
 public class QuadradoGrade : MonoBehaviour {
 
-    //se o quadrado esta preenchido por alguma peca ou nao
-    public bool ocupado = false;
+    //qual eh o preenchimento do quadrado
+    public Preenchimento interior = Preenchimento.Livre;
 
-    //peca que quadrado de peca que o preenche
+    //quadrado de peca que o preenche o espaço
     public QuadradoPeca quadradoPeca = null;
 
     public void Preenche(QuadradoPeca quadrado)
     {
         quadradoPeca = quadrado;
-        ocupado = true;
+        interior = Preenchimento.Peca;
     }
 
     public void Esvazia()
@@ -23,6 +31,6 @@ public class QuadradoGrade : MonoBehaviour {
         {
             Destroy(quadradoPeca);
         }
-        ocupado = false;
+        interior = Preenchimento.Livre;
     }
 }

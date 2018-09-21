@@ -70,7 +70,7 @@ public class Peca : MonoBehaviour {
     {
         foreach( QuadradoPeca quadrado in quadrados )
         {
-            if (grade.quadrados[quadrado.posicao.x, quadrado.posicao.y].ocupado) return true;
+            if (grade.quadrados[quadrado.posicao.x, quadrado.posicao.y].interior != Preenchimento.Livre) return true;
         }
 
         return false;
@@ -79,33 +79,40 @@ public class Peca : MonoBehaviour {
     //move peca para esquerda caso possivel
     protected void MoveEsquerda()
     {
-        //checa se algum quadrado da peca esta em alguma borda da lateral da grade
-        if (ChecaLimiteHorizontal(0)) return;
-
-        //move quadrados da peca para a esquerda
-        MovePeca( new Vector2Int(0, -1) );
-
-        //se nova posicao nao colidir
-        if (!ChecaColisao()) return;
-
-        //se colidir, move tudo de volta
-        MovePeca( new Vector2Int(0, 1) );
+        MovePecaCheck( new Vector2Int(0, -1) );
     }
 
     //move peca para a direita caso possivel
     protected void MoveDireita()
     {
-        //checa se algum quadrado da peca esta em alguma borda da lateral da grade
-        if (ChecaLimiteHorizontal(Grade.colunas - 1)) return;
+        MovePecaCheck( new Vector2Int(0, 1) );
+    }
 
-        //move quadrados da peca para a direita
-        MovePeca( new Vector2Int(0, 1) );
+    //move peca apenas se a nova posicao for valida
+    //retorna se foi possível mover a peça ou não
+    public bool MovePecaCheck( Vector2Int deslocamento )
+    {
+        VirtualMovePeca(deslocamento);
 
-        //se nova posicao nao colidir com outra peca
-        if (!ChecaColisao()) return;
+        //se nova posição for válida
+        if( ValidaPosicao() )
+        {
+            //para cada quadrado que compõe a peça
+            foreach (QuadradoPeca quadrado in quadrados)
+            {
+                //de fato move o objeto para a nova posição
+                quadrado.Materializa();
+            }
+            centro += deslocamento;
 
-        //se colidir, move tudo de volta
-        MovePeca( new Vector2Int(0, -1) );
+            return true;
+        }
+        else
+        {
+            VirtualMovePeca(Vector2Int.zero - deslocamento);
+
+            return false;
+        }
     }
 
     //move a peca deslocamento.x quadrados para direita e deslocamento.y para baixo
@@ -119,12 +126,24 @@ public class Peca : MonoBehaviour {
         centro += deslocamento;
     }
 
+    //move a peca deslocamento.x quadrados para direita e deslocamento.y para baixo
+    //x e y podem ser negativos
+    //não move de fato os game objects, mas altera o resto das propriedades relacionadas à posição
+    public void VirtualMovePeca(Vector2Int deslocamento)
+    {
+        foreach (QuadradoPeca quadrado in quadrados)
+        {
+            quadrado.VirtualMove(quadrado.posicao + deslocamento);
+        }
+        centro += deslocamento;
+    }
+
     //checa se algum quadrado da peca esta em alguma borda da lateral da grade
     protected bool ChecaLimiteHorizontal(int limite)
     {
         foreach (QuadradoPeca quadrado in quadrados)
         {
-            if (quadrado.ChecaLimiteHorizontal(limite)) return true;
+            if (quadrado.ChecaLimiteHorizontal()) return true;
         }
         return false;
     }
@@ -140,26 +159,27 @@ public class Peca : MonoBehaviour {
     }
 
     //faz a peca cair uma linha
+    //é o método que identifica que se peça parou de cair
     protected void moveBaixo()
     {
         /**
         //se a peca estiver no fundo da grade
-        if(checaLimiteVertical())
+        if(ChecaLimiteVertical())
         {
-            apagaPeca();
+            ApagaPeca();
             return;
         }
 
         //move quadrados da peca para baixo
-        movePeca( new Vector2Int(1, 0) );
+        MovePeca( new Vector2Int(1, 0) );
 
         //se nova posicao nao colidir com outra peca
-        if (!checaColisao()) return;
+        if (!ChecaColisao()) return;
 
         //se colidir, move tudo de volta
-        movePeca( new Vector2Int(-1, 0) );
+        MovePeca( new Vector2Int(-1, 0) );
 
-        apagaPeca();
+        ApagaPeca();
         **/
     }
 
@@ -180,7 +200,7 @@ public class Peca : MonoBehaviour {
 
     protected virtual void GiraPeca()
     {
-        Rotacao.GiraPeca(1, this);
+        Rotacao.GiraPecaCheck(1, this);
     }
 
     //retorna maior linha ocupada pela peca
@@ -222,6 +242,19 @@ public class Peca : MonoBehaviour {
         return min;
     }
 
+    //diz se a posicao em que está a peça é permitida ou não
+    public bool ValidaPosicao()
+    {
+        foreach (QuadradoPeca quadrado in quadrados)
+        {
+            if( !quadrado.ValidaPosicao())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void HandleInput()
     {
         if( playerKeys.GetRawHorizontal() == 1)
@@ -235,6 +268,10 @@ public class Peca : MonoBehaviour {
         else if( playerKeys.GetRawVertical() == 1)
         {
             GiraPeca();
+        }
+        else if (playerKeys.GetRawVertical() == -1)
+        {
+
         }
     }
 }
