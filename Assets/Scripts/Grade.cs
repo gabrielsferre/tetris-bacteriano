@@ -48,4 +48,9 @@ public class Grade : MonoBehaviour {
             }
         }
     }
+
+    public void CriaPeca()
+    {
+        Instantiate(peca, transform);
+    }
 }

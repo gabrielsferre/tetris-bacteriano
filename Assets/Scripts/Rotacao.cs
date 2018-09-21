@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rotacao {
+public class Rotacao
+{
 
 
     //retorna vetor com as distancias horizontal(x) e vertical(y) do quadrado ao centro
@@ -20,7 +21,7 @@ public class Rotacao {
     //retorna posicao do quadrado girada de 90 graus em torno do centro
     //se sentido for 1, gira no sentido horário
     //se sentido for -1, gira no sentido anti-horário
-    private static Vector2Int GiraQuadrado( int sentido, Peca peca,  QuadradoPeca quadrado)
+    private static Vector2Int GiraQuadrado(int sentido, Peca peca, QuadradoPeca quadrado)
     {
         Vector2Int distancia = DistanciaCentro(peca, quadrado); //distancia do quadrado ao centro da peca
 
@@ -33,9 +34,9 @@ public class Rotacao {
 
     //gira a peça sem mover o objeto peça
     //muda apenas o atributo 'posicao' dos quadrados que compõe a peça
-    public static void VirtualGiraPeca( int sentido, Peca peca )
+    public static void VirtualGiraPeca(int sentido, Peca peca)
     {
-        foreach( QuadradoPeca quadrado in peca.quadrados )
+        foreach (QuadradoPeca quadrado in peca.quadrados)
         {
             Vector2Int novaPosicao = GiraQuadrado(sentido, peca, quadrado);
             quadrado.VirtualMove(novaPosicao);
@@ -44,7 +45,7 @@ public class Rotacao {
 
     //gira a peça sem mover o objeto peça
     //muda apenas o atributo 'posicao' dos quadrados que compõe a peça
-    public static void VirtualGiraPecaReta( int sentido, Peca peca )
+    public static void VirtualGiraPecaReta(int sentido, Peca peca)
     {
         Vector2Int distancia = DistanciaCentro(peca, peca.quadrados[0]); //distancia ao centro do quadrado que é separado do resto da peça pelo centro
 
@@ -58,10 +59,68 @@ public class Rotacao {
             peca.VirtualMovePeca(new Vector2Int(-distancia.y, distancia.x));
         }
 
-        foreach (QuadradoPeca quadrado in peca.quadrados)
+        VirtualGiraPeca(sentido, peca);
+    }
+
+    //gira peca apenas se a nova posição for válida
+    //tenta mudar a posição da peça para possibilitar o giro caso seja necessário
+    //retorna se foi possível girar a peça ou não
+    public static bool GiraPecaCheck(int sentido, Peca peca, System.Action<int,Peca> funcaoDeGiro)
+    {
+        //gira a peça virtualmente
+        funcaoDeGiro(sentido, peca); //VirtualGiraPeca ou VirtualGiraPecaReta
+      
+
+        //se a posição for válida
+        if( peca.ValidaPosicao() )
         {
-            Vector2Int novaPosicao = GiraQuadrado(sentido, peca, quadrado);
-            quadrado.VirtualMove(novaPosicao);
+            peca.MaterializaPeca();
+            return true;
         }
+
+        //tenta mover a peça uma posição para a direita
+        if( peca.MovePecaCheck( new Vector2Int(0,-1)))
+        {
+            return true;
+        }
+        //tenta mover a peça duas posições para a direita
+        if (peca.MovePecaCheck(new Vector2Int(0, -2)))
+        {
+            return true;
+        }
+        //tenta mover a peça uma posição para a esquerda
+        if (peca.MovePecaCheck(new Vector2Int(0, 1)))
+        {
+            return true;
+        }
+        //tenta mover a peça duas posições para a esquerda
+        if (peca.MovePecaCheck(new Vector2Int(0, 2)))
+        {
+            return true;
+        }
+        //tenta mover a peça uma posição para cima
+        if (peca.MovePecaCheck(new Vector2Int(-1, 0)))
+        {
+            return true;
+        }
+        //tenta mover a peça duas posições para cima
+        if (peca.MovePecaCheck(new Vector2Int(-2, 0)))
+        {
+            return true;
+        }
+        //tenta mover a peça uma posição para baixo
+        if (peca.MovePecaCheck(new Vector2Int(1, 0)))
+        {
+            return true;
+        }
+        //tenta mover a peça duas posições para baixo
+        if (peca.MovePecaCheck(new Vector2Int(2, 0)))
+        {
+            return true;
+        }
+        //gira peça de volta
+        funcaoDeGiro(-sentido, peca);
+
+        return false;
     }
 }

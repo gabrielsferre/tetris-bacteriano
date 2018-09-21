@@ -17,6 +17,6 @@ public class PecaReta : Peca
 
     protected override void GiraPeca()
     {
-        Rotacao.GiraPecaRetaCheck(1, this);
+        Rotacao.GiraPecaCheck(1, this, Rotacao.VirtualGiraPecaReta);
     }
 }
