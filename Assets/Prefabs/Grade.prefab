@@ -67,5 +67,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   direita: 275
   esquerda: 276
-  baixo: 0
-  cima: 0
+  baixo: 274
+  cima: 273

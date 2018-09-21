@@ -10,13 +10,14 @@ public class Peca : MonoBehaviour {
     public const float tempoQueda = 0.5f;
 
     //array com quadrados que compõe a peca
-    protected QuadradoPeca[] quadrados = new QuadradoPeca[4];
+    public QuadradoPeca[] quadrados = new QuadradoPeca[4];
 
     //posicao do centro da peca, influencia em como ela vai girar
-    protected int[] centro = new int[2];
+    //centro.x é a linha e centro.y, a coluna
+    public Vector2Int centro = new Vector2Int();
 
     //linha e coluna de surgimento do centro da peca
-    protected int[] posicaoSurgimento = { 1, 4 };
+    protected Vector2Int posicaoSurgimento = new Vector2Int(6,4);
 
     protected Grade grade;
 
@@ -35,154 +36,241 @@ public class Peca : MonoBehaviour {
 
     protected void Start()
     {
-        criaPeca();
+        CriaPeca();
 
-        InvokeRepeating("moveBaixo", tempoQueda, tempoQueda);
+        //InvokeRepeating("MoveBaixo", tempoQueda, tempoQueda);
     }
 
     private void Update()
     {
-        handleInput();
+        HandleInput();
     }
 
     //cria quadrados para a peca e define seu centro
-    protected void criaPeca()
+    protected void CriaPeca()
     {
         for( int i = 0; i < quadrados.Length; i++ )
         {
             quadrados[i] = Instantiate(prefabQuadrado);
         }
 
-        montaPeca();
+        MontaPeca();
     }
 
-    protected virtual void montaPeca()
+    //monta a peça em seu formato padrão, varia para cada classe de peça
+    //este método funciona como um tipo de método abstrato para as outras classes de peças
+    protected virtual void MontaPeca()
     {
-        print("algo errado");
+        Debug.Log("algo errado em montaPeca");
     }
 
 
     //checa se algum quadrado da peca esta sobreposto a outro quadrado
-    protected bool checaColisao()
+    protected bool ChecaColisao()
     {
         foreach( QuadradoPeca quadrado in quadrados )
         {
-            if (grade.quadrados[quadrado.linha, quadrado.coluna].ocupado) return true;
+            if (grade.quadrados[quadrado.posicao.x, quadrado.posicao.y].interior != Preenchimento.Livre) return true;
         }
 
         return false;
     }
 
     //move peca para esquerda caso possivel
-    protected void moveEsquerda()
+    protected void MoveEsquerda()
     {
-        //checa se algum quadrado da peca esta em alguma borda da lateral da grade
-        if (checaLimiteHorizontal(0)) return;
-
-        //move quadrados da peca para a esquerda
-        movePeca(0, -1);
-
-        //se nova posicao nao colidir
-        if (!checaColisao()) return;
-
-        //se colidir, move tudo de volta
-        movePeca(0, 1);
+        MovePecaCheck( new Vector2Int(0, -1) );
     }
 
     //move peca para a direita caso possivel
-    protected void moveDireita()
+    protected void MoveDireita()
     {
-        //checa se algum quadrado da peca esta em alguma borda da lateral da grade
-        if (checaLimiteHorizontal(Grade.colunas - 1)) return;
-
-        //move quadrados da peca para a direita
-        movePeca(0, 1);
-
-        //se nova posicao nao colidir com outra peca
-        if (!checaColisao()) return;
-
-        //se colidir, move tudo de volta
-        movePeca(0, -1);
+        MovePecaCheck( new Vector2Int(0, 1) );
     }
 
-    //move a peca i quadrados para direita e j para baixo
-    //i e j podem ser negativos
-    protected void movePeca( int i, int j )
+    //move peca apenas se a nova posicao for valida
+    //retorna se foi possível mover a peça ou não
+    public bool MovePecaCheck( Vector2Int deslocamento )
+    {
+        VirtualMovePeca(deslocamento);
+
+        //se nova posição for válida
+        if( ValidaPosicao() )
+        {
+            MaterializaPeca();
+
+            return true;
+        }
+        else
+        {
+            VirtualMovePeca(Vector2Int.zero - deslocamento);
+
+            return false;
+        }
+    }
+
+    //move a peca deslocamento.x quadrados para direita e deslocamento.y para baixo
+    //x e y podem ser negativos
+    public void MovePeca( Vector2Int deslocamento )
     {
         foreach (QuadradoPeca quadrado in quadrados)
         {
-            quadrado.move(quadrado.linha + i, quadrado.coluna + j);
+            quadrado.Move( quadrado.posicao + deslocamento);
         }
-        centro[0] += i;
-        centro[1] += j;
+        centro += deslocamento;
+    }
+
+    //move a peca deslocamento.x quadrados para direita e deslocamento.y para baixo
+    //x e y podem ser negativos
+    //não move de fato os game objects, mas altera o resto das propriedades relacionadas à posição
+    public void VirtualMovePeca(Vector2Int deslocamento)
+    {
+        foreach (QuadradoPeca quadrado in quadrados)
+        {
+            quadrado.VirtualMove(quadrado.posicao + deslocamento);
+        }
+        centro += deslocamento;
+    }
+
+    //move todos os game objects(quadrados) que compõe a peça para suas respectivas posições
+    public void MaterializaPeca()
+    {
+        //para cada quadrado que compõe a peça
+        foreach (QuadradoPeca quadrado in quadrados)
+        {
+            //de fato move o objeto para a nova posição
+            quadrado.Materializa();
+        }
     }
 
     //checa se algum quadrado da peca esta em alguma borda da lateral da grade
-    protected bool checaLimiteHorizontal(int limite)
+    protected bool ChecaLimiteHorizontal(int limite)
     {
         foreach (QuadradoPeca quadrado in quadrados)
         {
-            if (quadrado.checaLimiteHorizontal(limite)) return true;
+            if (quadrado.ChecaLimiteHorizontal()) return true;
         }
         return false;
     }
 
     //checa se algum quadrado da peca esta no fundo da grade
-    protected bool checaLimiteVertical()
+    protected bool ChecaLimiteVertical()
     {
         foreach (QuadradoPeca quadrado in quadrados)
         {
-            if (quadrado.checaLimiteVertical()) return true;
+            if (quadrado.ChecaLimiteVertical()) return true;
         }
         return false;
     }
 
     //faz a peca cair uma linha
-    protected void moveBaixo()
+    //é o método que identifica que se peça parou de cair
+    protected void MoveBaixo()
     {
-        //se a peca estiver no fundo da grade
-        if(checaLimiteVertical())
+        //se não for possível mover peça para baixo
+        if( !MovePecaCheck( new Vector2Int(1,0)) )
         {
-            apagaPeca();
-            return;
+            ApagaPeca();
+            GetComponentInParent<Grade>().CriaPeca();
         }
-
-        //move quadrados da peca para baixo
-        movePeca(1, 0);
-
-        //se nova posicao nao colidir com outra peca
-        if (!checaColisao()) return;
-
-        //se colidir, move tudo de volta
-        movePeca(-1, 0);
-
-        apagaPeca();
     }
 
-    //deleta objeto peça e atualiza quadrados da grade
-    //os quadrados que ficarão na grade não estarão mais ligados à peça
-    //tambem checa se alguma linha da grade esta completa
-    protected void apagaPeca()
+    /// <summary>
+    ///deleta objeto peça e atualiza quadrados da grade
+    ///os quadrados que ficarão na grade não estarão mais ligados à peça
+    ///tambem checa se alguma linha da grade esta completa
+    /// </summary>
+
+    protected void ApagaPeca()
     {
         foreach( QuadradoPeca quadrado in quadrados )
         {
             //preenche quadrado da grade com quadrado da peça
-            QuadradoGrade quadradoGrade = grade.quadrados[quadrado.linha, quadrado.coluna];
-            quadradoGrade.preenche( quadrado );
+            Debug.Log(quadrado.posicao);
+            QuadradoGrade quadradoGrade = grade.quadrados[quadrado.posicao.x, quadrado.posicao.y];
+            quadradoGrade.Preenche( quadrado );
         }
 
         Destroy(gameObject);
     }
 
-    private void handleInput()
+    protected virtual void GiraPeca()
     {
-        if( playerKeys.getRawHorizontal() == 1)
+        Rotacao.GiraPecaCheck(1, this, Rotacao.VirtualGiraPeca);
+    }
+
+    //retorna maior linha ocupada pela peca
+    public int MaxLin()
+    {
+        int max = 0;
+
+        foreach (QuadradoPeca quadrado in quadrados)
         {
-            moveDireita();
+            max = Mathf.Max(max, quadrado.posicao.x);
         }
-        else if( playerKeys.getRawHorizontal() == -1)
+
+        return max;
+    }
+
+    //retorna maior coluna ocupada pela peca
+    public int MaxCol()
+    {
+        int max = 0;
+
+        foreach (QuadradoPeca quadrado in quadrados)
         {
-            moveEsquerda();
+            max = Mathf.Max(max, quadrado.posicao.y);
+        }
+
+        return max;
+    }
+
+    //retorna menor coluna ocupada pela peca
+    public int MinCol()
+    {
+        int min = Grade.colunas - 1;
+
+        foreach (QuadradoPeca quadrado in quadrados)
+        {
+            min = Mathf.Min(min, quadrado.posicao.y);
+        }
+
+        return min;
+    }
+
+    /// <summary>
+    /// diz se a posicao em que está a peça é permitida ou não
+    /// </summary>
+    /// <returns></returns>
+    public bool ValidaPosicao()
+    {
+        foreach (QuadradoPeca quadrado in quadrados)
+        {
+            if( !quadrado.ValidaPosicao())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void HandleInput()
+    {
+        if( playerKeys.GetRawHorizontal() == 1)
+        {
+            MoveDireita();
+        }
+        else if( playerKeys.GetRawHorizontal() == -1)
+        {
+            MoveEsquerda();
+        }
+        else if( playerKeys.GetRawVertical() == 1)
+        {
+            GiraPeca();
+        }
+        else if (playerKeys.GetRawVertical() == -1)
+        {
+            MoveBaixo();
         }
     }
 }

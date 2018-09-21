@@ -5,9 +5,9 @@ using UnityEngine;
 //Quadrado de uma peca
 public class QuadradoPeca : MonoBehaviour
 {
-    //indices da linha e coluna em que se encontra o quadrado
-    public int linha;
-    public int coluna;
+    //posicao do quadrado na grade
+    //posicao.x é a linha e posicao.y, a coluna
+    public Vector2Int posicao = new Vector2Int();
 
     protected Grade grade;
 
@@ -16,24 +16,53 @@ public class QuadradoPeca : MonoBehaviour
         grade = FindObjectOfType<Grade>();
     }
 
-    //checa se o quadrado esta na coluna 'limite'
-    public bool checaLimiteHorizontal(int limite)
+    //diz se o quadrado esta entre as colunas da grade
+    public bool ChecaLimiteHorizontal()
     {
-        return coluna == limite;
+        return posicao.y >= 0 && posicao.y < Grade.colunas;
     }
 
-    //checa se o quadrado esta no fundo da grade
-    public bool checaLimiteVertical()
+    //diz se o quadrado esta entre as linhas da grade
+    public bool ChecaLimiteVertical()
     {
-        return linha < 0 || linha >= (Grade.linhas - 1);
+        return posicao.x >= 0 && posicao.x < Grade.linhas;
+    }
+
+    //diz se o quadrado está dentro da grade
+    public bool ChecaLimite()
+    {
+        return ChecaLimiteHorizontal() && ChecaLimiteVertical();
+    }
+
+    //diz se a posicao em que está o quadrado é permitida ou não
+    public bool ValidaPosicao()
+    {
+        //se peça estiver fora da grade
+        if( !ChecaLimite() )
+        {
+            return false;
+        }
+
+        //diz se a peça não está sobrepondo nenhuma outra
+        return grade.quadrados[posicao.x, posicao.y].interior == Preenchimento.Livre;
     }
 
     //move o quadrado para uma dada posicao da grade
-    public void move(int novaLinha, int novaColuna)
+    public void Move(Vector2Int novaPosicao)
     {
-        linha = novaLinha;
-        coluna = novaColuna;
+        VirtualMove(novaPosicao);
+        Materializa();
+    }
 
-        transform.position = grade.quadrados[linha, coluna].transform.position + new Vector3(0, 0, -1);
+    //muda o atributo 'posicao' mas não desloca o quadrado de fato
+    public void VirtualMove(Vector2Int novaPosicao)
+    {
+        posicao = novaPosicao;
+    }
+
+    //desloca o quadrado para local correspondente ao atributo 'posição'
+    public void Materializa()
+    {
+        transform.position = grade.quadrados[posicao.x, posicao.y].transform.position + new Vector3(0, 0, -1);
     }
 }
