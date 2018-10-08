@@ -17,7 +17,7 @@ public class Peca : MonoBehaviour {
     public Vector2Int centro = new Vector2Int();
 
     //linha e coluna de surgimento do centro da peca
-    protected Vector2Int posicaoSurgimento = new Vector2Int(6,4);
+    protected Vector2Int posicaoSurgimento = new Vector2Int(2,4);
 
     protected Grade grade;
 
@@ -61,7 +61,7 @@ public class Peca : MonoBehaviour {
     //este método funciona como um tipo de método abstrato para as outras classes de peças
     protected virtual void MontaPeca()
     {
-        Debug.Log("algo errado em montaPeca");
+        Debug.Log("algo errado em MontaPeca");
     }
 
 
@@ -70,13 +70,13 @@ public class Peca : MonoBehaviour {
     {
         foreach( QuadradoPeca quadrado in quadrados )
         {
-            if (grade.quadrados[quadrado.posicao.x, quadrado.posicao.y].interior != Preenchimento.Livre) return true;
+            if (grade.quadrados[quadrado.posicao.x][quadrado.posicao.y].interior != Preenchimento.Livre) return true;
         }
 
         return false;
     }
 
-    //move peca para esquerda caso possivel
+    //move peca para esquerda caso possível
     protected void MoveEsquerda()
     {
         MovePecaCheck( new Vector2Int(0, -1) );
@@ -88,7 +88,7 @@ public class Peca : MonoBehaviour {
         MovePecaCheck( new Vector2Int(0, 1) );
     }
 
-    //move peca apenas se a nova posicao for valida
+    //move peca apenas se a nova posicao for válida
     //retorna se foi possível mover a peça ou não
     public bool MovePecaCheck( Vector2Int deslocamento )
     {
@@ -107,17 +107,6 @@ public class Peca : MonoBehaviour {
 
             return false;
         }
-    }
-
-    //move a peca deslocamento.x quadrados para direita e deslocamento.y para baixo
-    //x e y podem ser negativos
-    public void MovePeca( Vector2Int deslocamento )
-    {
-        foreach (QuadradoPeca quadrado in quadrados)
-        {
-            quadrado.Move( quadrado.posicao + deslocamento);
-        }
-        centro += deslocamento;
     }
 
     //move a peca deslocamento.x quadrados para direita e deslocamento.y para baixo
@@ -170,15 +159,30 @@ public class Peca : MonoBehaviour {
         //se não for possível mover peça para baixo
         if( !MovePecaCheck( new Vector2Int(1,0)) )
         {
-            ApagaPeca();
-            GetComponentInParent<Grade>().CriaPeca();
+            PecaPosicionada();
         }
     }
 
     /// <summary>
-    ///deleta objeto peça e atualiza quadrados da grade
-    ///os quadrados que ficarão na grade não estarão mais ligados à peça
-    ///tambem checa se alguma linha da grade esta completa
+    /// Chamado quando a peça acaba de cair
+    /// </summary>
+    private void PecaPosicionada()
+    {
+        int linhaMin = MinLin(); //menor linha ocupada pela peça
+        int linhaMax = MaxLin(); //maior linha ocupada pela peça
+
+        ApagaPeca();
+
+        grade.AposQueda(linhaMin, linhaMax);
+
+        //temporário
+        GetComponentInParent<Grade>().CriaPeca();
+    }
+
+    /// <summary>
+    ///Deleta objeto peça e atualiza quadrados da grade.
+    ///Os quadrados que ficarão na grade não estarão mais ligados à peça.
+    ///Tambem checa se alguma linha da grade esta completa
     /// </summary>
 
     protected void ApagaPeca()
@@ -186,9 +190,8 @@ public class Peca : MonoBehaviour {
         foreach( QuadradoPeca quadrado in quadrados )
         {
             //preenche quadrado da grade com quadrado da peça
-            Debug.Log(quadrado.posicao);
-            QuadradoGrade quadradoGrade = grade.quadrados[quadrado.posicao.x, quadrado.posicao.y];
-            quadradoGrade.Preenche( quadrado );
+            QuadradoGrade quadradoGrade = grade.quadrados[quadrado.posicao.x][quadrado.posicao.y];
+            quadradoGrade.Preenche(quadrado);
         }
 
         Destroy(gameObject);
@@ -210,6 +213,19 @@ public class Peca : MonoBehaviour {
         }
 
         return max;
+    }
+
+    //retorna menor coluna ocupada pela peca
+    public int MinLin()
+    {
+        int min = Grade.linhas - 1;
+
+        foreach (QuadradoPeca quadrado in quadrados)
+        {
+            min = Mathf.Min(min, quadrado.posicao.x);
+        }
+
+        return min;
     }
 
     //retorna maior coluna ocupada pela peca
@@ -239,7 +255,7 @@ public class Peca : MonoBehaviour {
     }
 
     /// <summary>
-    /// diz se a posicao em que está a peça é permitida ou não
+    /// Diz se a posicao em que está a peça é permitida ou não
     /// </summary>
     /// <returns></returns>
     public bool ValidaPosicao()

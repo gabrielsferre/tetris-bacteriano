@@ -14,23 +14,26 @@ public enum Preenchimento
 public class QuadradoGrade : MonoBehaviour {
 
     //qual eh o preenchimento do quadrado
-    public Preenchimento interior = Preenchimento.Livre;
+    public Preenchimento interior { get; private set;}
 
     //quadrado de peca que o preenche o espaço
-    public QuadradoPeca quadradoPeca = null;
+    public QuadradoPeca quadradoPeca { get; private set; }
+
 
     public void Preenche(QuadradoPeca quadrado)
     {
         quadradoPeca = quadrado;
         interior = Preenchimento.Peca;
+        quadrado.transform.position = transform.position - Vector3.forward;
     }
 
     public void Esvazia()
     {
         if( quadradoPeca != null)
         {
-            Destroy(quadradoPeca);
+            Destroy(quadradoPeca.gameObject);
         }
+        quadradoPeca = null;
         interior = Preenchimento.Livre;
     }
 }
