@@ -60,7 +60,6 @@ public class Grade : MonoBehaviour {
     /// <param name="peca"></param>
     public void AposQueda(int linhaMin, int linhaMax)
     {
-        int linhas = linhaMax - linhaMin + 1; //número de linhas ocupadas pela peça
 
         Sequence sequenciaFade = DOTween.Sequence();    //sequencia usada para dar o fade nas linhas apagadas
         Sequence sequenciaDesce = DOTween.Sequence();   //sequencia usada para fazer as linhas caírem
@@ -70,9 +69,12 @@ public class Grade : MonoBehaviour {
 
         //apaga linhas que foram completadas pela peça
         int naoApagadas = ApagaCompletasDesceIncompletas(linhaMin, linhaMax, sequenciaFade, sequenciaDesce); //número de linhas que não foram apagadas
-
+        
         //desce as linhas que estão em cima das peças apagadas
         DesceLinhas(linhaMax - naoApagadas, linhaMin, sequenciaDesce);
+
+        sequenciaFade.Pause();
+        sequenciaDesce.Pause();
 
         sequenciaFade.Play();
     }
@@ -221,7 +223,7 @@ public class Grade : MonoBehaviour {
             {
                 int iNotClosure = i;    //variável para driblar o closure
 
-                int linhaFinal = linhaBase + i - linhaTopo + 1; //linha em que a linha de quadrados atual deve terminar a queda
+                int linhaFinal = linhaBase + iNotClosure - linhaTopo + 1; //linha em que a linha de quadrados atual deve terminar a queda
 
                 //cria sequencia para animar queda da linha
                 Sequence novaSequencia = Efeitos.MoveLinha(quadrados[i], quadrados[linhaFinal]);

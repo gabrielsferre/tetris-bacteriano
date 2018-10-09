@@ -5,8 +5,8 @@ using DG.Tweening;
 
 public class Efeitos {
 
-    const float tempoFade = 5f;
-    const float velocidadeQueda = 0.5f;
+    const float tempoFade = 0.5f;
+    const float velocidadeQueda = 2f;
 
     /// <summary>
     /// Faz o quadrado brilhar e desaparecer gradativamente
