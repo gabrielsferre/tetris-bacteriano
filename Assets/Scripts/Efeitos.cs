@@ -83,16 +83,20 @@ public class Efeitos {
     {
         Sequence sequencia = DOTween.Sequence();
 
-        for( int j = 0; j < Grade.colunas; j++)
+        if (linhaInicial != linhaFinal)
         {
-            if (linhaInicial[j].quadradoPeca != null)
+            for (int j = 0; j < Grade.colunas; j++)
             {
-                float posInicial = linhaInicial[j].transform.position.y;
-                float posFinal = linhaFinal[j].transform.position.y;
+                if (linhaInicial[j].quadradoPeca != null)
+                {
+                    float posInicial = linhaInicial[j].transform.position.y;
+                    float posFinal = linhaFinal[j].transform.position.y;
 
-                sequencia.Insert(0, MoveQuadrado(linhaInicial[j].quadradoPeca, posInicial, posFinal));
-             }
-        
+                    sequencia.Insert(0, MoveQuadrado(linhaInicial[j].quadradoPeca, posInicial, posFinal));
+                }
+
+            }
+            
         }
 
         return sequencia;

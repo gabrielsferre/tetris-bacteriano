@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System;
 
 public class Grade : MonoBehaviour {
 
@@ -60,18 +61,24 @@ public class Grade : MonoBehaviour {
     /// <param name="peca"></param>
     public void AposQueda(int linhaMin, int linhaMax)
     {
-
         Sequence sequenciaFade = DOTween.Sequence();    //sequencia usada para dar o fade nas linhas apagadas
         Sequence sequenciaDesce = DOTween.Sequence();   //sequencia usada para fazer as linhas caírem
+
+        //Fila de métodos que serão executados após fim das animações de queda das peças
+        //São métodos que apagam as peças que devem ser pagadas e descem as peças que devem cair
+        List<Action> listaMetodos = new List<Action>();
 
         //começa animação de queda das peças depois que as linhas completas desaparecerem
         sequenciaFade.OnComplete(() => sequenciaDesce.Play());
 
+        //executa métodos da fila após fim da animação de queda
+        sequenciaDesce.OnComplete(() => listaMetodos.ForEach(action => action()));
+
         //apaga linhas que foram completadas pela peça
-        int naoApagadas = ApagaCompletasDesceIncompletas(linhaMin, linhaMax, sequenciaFade, sequenciaDesce); //número de linhas que não foram apagadas
+        int naoApagadas = ApagaCompletasDesceIncompletas(linhaMin, linhaMax, sequenciaFade, sequenciaDesce, listaMetodos); //número de linhas que não foram apagadas
         
         //desce as linhas que estão em cima das peças apagadas
-        DesceLinhas(linhaMax - naoApagadas, linhaMin, sequenciaDesce);
+        DesceLinhas(linhaMax - naoApagadas, linhaMin, sequenciaDesce, listaMetodos);
 
         sequenciaFade.Pause();
         sequenciaDesce.Pause();
@@ -84,7 +91,7 @@ public class Grade : MonoBehaviour {
     /// Retorna o número de linhas que não foram completadas pela peça (dentre as linhas em que a peça ocupou).
     /// Tudo isso após o término de tweens
     /// </summary>
-    private int ApagaCompletasDesceIncompletas(int linhaMin, int linhaMax, Sequence sequenciaFade, Sequence sequenciaDesce)
+    private int ApagaCompletasDesceIncompletas(int linhaMin, int linhaMax, Sequence sequenciaFade, Sequence sequenciaDesce, List<Action> listaMetodos)
     {
 
         int naoApagadas = 0;  //número de linhas que não puderam ser apagadas
@@ -97,11 +104,12 @@ public class Grade : MonoBehaviour {
                 int iNotClosure = i;    //variável para driblar o closure ao usar ApagaLinha na expressão labda
 
                 //cria sequencia para animar as peças sumindo
-                Sequence novaSequencia = Efeitos.FadeLinha(quadrados[i]);
-                //chama método que apaga as peças quando a sequencia acabar
-                novaSequencia.OnComplete(() => ApagaLinha(iNotClosure));
+                Sequence novaSequencia = Efeitos.FadeLinha(quadrados[iNotClosure]);
                 //adiciona sequencia na sequencia com todas as animações de peças sumindo
                 sequenciaFade.Insert(0, novaSequencia);
+
+                //adiciona na lista método que apaga as peças quando a sequencia acabar
+                listaMetodos.Add(() => ApagaLinha(iNotClosure));
             }
             else
             {
@@ -113,11 +121,15 @@ public class Grade : MonoBehaviour {
                     int naoApagadasNotClosure = naoApagadas;    //variável para driblar o closure
 
                     //cria sequencia para animar queda da linha
-                    Sequence novaSequencia = Efeitos.MoveLinha(quadrados[i], quadrados[linhaMax - naoApagadas]);
-                    //chama método que move as peças quando a sequencia acabar
-                    novaSequencia.OnComplete(() => MoveLinha(iNotClosure, linhaMax - naoApagadasNotClosure));
+                    Sequence novaSequencia = Efeitos.MoveLinha(quadrados[iNotClosure], quadrados[linhaMax - naoApagadas]);
                     //adiciona sequencia na sequencia com todas as animações de queda
                     sequenciaDesce.Insert(0, novaSequencia);
+
+                    //sem esse comando a sequencia para de funcionar misteriosamente
+                    novaSequencia.OnComplete(() => { });
+
+                    //adiciona na lista método que move as peças
+                    listaMetodos.Add(() => MoveLinha(iNotClosure, linhaMax - naoApagadasNotClosure));
                 }
                 naoApagadas++;
             }
@@ -214,7 +226,7 @@ public class Grade : MonoBehaviour {
     /// </summary>
     /// <param name="linhaBase"></param>
     /// <param name="linhaTopo"></param>
-    private void DesceLinhas(int linhaBase, int linhaTopo, Sequence sequenciaDesce)
+    private void DesceLinhas(int linhaBase, int linhaTopo, Sequence sequenciaDesce, List<Action> listaMetodos)
     {
         //caso a base esteja embaixo ou junto do topo
         if (linhaBase >= linhaTopo)
@@ -226,11 +238,15 @@ public class Grade : MonoBehaviour {
                 int linhaFinal = linhaBase + iNotClosure - linhaTopo + 1; //linha em que a linha de quadrados atual deve terminar a queda
 
                 //cria sequencia para animar queda da linha
-                Sequence novaSequencia = Efeitos.MoveLinha(quadrados[i], quadrados[linhaFinal]);
-                //chama método que move as peças quando a sequencia acabar
-                novaSequencia.OnComplete(() => MoveLinha(iNotClosure, linhaFinal));
+                Sequence novaSequencia = Efeitos.MoveLinha(quadrados[iNotClosure], quadrados[linhaFinal]);
                 //adiciona sequencia na sequencia com todas as animações de queda
                 sequenciaDesce.Insert(0, novaSequencia);
+
+                //sem esse comando a sequencia para de funcionar misteriosamente
+                novaSequencia.OnComplete(() => { });
+
+                //adiciona na lista método que move as peças
+                listaMetodos.Add(() => MoveLinha(iNotClosure, linhaFinal));
             }
         }
     }
@@ -240,7 +256,8 @@ public class Grade : MonoBehaviour {
     /// </summary>
     public void CriaPeca()
     {
-        TipoPeca tipo = (TipoPeca) Random.Range(0, (int)TipoPeca.NUM_TIPOS);
+        TipoPeca tipo = (TipoPeca)UnityEngine.Random.Range(0, (int)TipoPeca.NUM_TIPOS);
+        //TipoPeca tipo = TipoPeca.I;
         Instantiate(prefabs[(int)tipo], transform);
     }
 }
