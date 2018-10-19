@@ -44,7 +44,7 @@ public class QuadradoPeca : MonoBehaviour
         }
 
         //diz se a peça não está sobrepondo nenhuma outra
-        return grade.quadrados[posicao.x, posicao.y].interior == Preenchimento.Livre;
+        return grade.quadrados[posicao.x][posicao.y].interior == Preenchimento.Livre;
     }
 
     //move o quadrado para uma dada posicao da grade
@@ -63,6 +63,6 @@ public class QuadradoPeca : MonoBehaviour
     //desloca o quadrado para local correspondente ao atributo 'posição'
     public void Materializa()
     {
-        transform.position = grade.quadrados[posicao.x, posicao.y].transform.position + new Vector3(0, 0, -1);
+        transform.position = grade.quadrados[posicao.x][posicao.y].transform.position + new Vector3(0, 0, -1);
     }
 }
