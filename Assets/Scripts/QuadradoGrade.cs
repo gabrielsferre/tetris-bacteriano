@@ -19,7 +19,11 @@ public class QuadradoGrade : MonoBehaviour {
     //quadrado de peca que o preenche o espaço
     public QuadradoPeca quadradoPeca { get; private set; }
 
-
+    /// <summary>
+    /// Preenche o quadrado com uma certa peça e atualiza
+    /// o preenchimento
+    /// </summary>
+    /// <param name="quadrado"></param>
     public void Preenche(QuadradoPeca quadrado)
     {
         quadradoPeca = quadrado;
@@ -27,6 +31,10 @@ public class QuadradoGrade : MonoBehaviour {
         quadrado.transform.position = transform.position - Vector3.forward;
     }
 
+    /// <summary>
+    /// Apaga a peça que estiver preenchendo o quadrado e atualiza
+    /// o preenchimento.
+    /// </summary>
     public void Esvazia()
     {
         if( quadradoPeca != null)

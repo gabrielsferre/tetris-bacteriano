@@ -173,10 +173,8 @@ public class Peca : MonoBehaviour {
 
         ApagaPeca();
 
+        //Lida com a completude de linhas e spawna a próxima peça
         grade.AposQueda(linhaMin, linhaMax);
-
-        //temporário
-        GetComponentInParent<Grade>().CriaPeca();
     }
 
     /// <summary>
