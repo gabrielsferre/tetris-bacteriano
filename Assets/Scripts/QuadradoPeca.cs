@@ -53,7 +53,7 @@ public class QuadradoPeca : MonoBehaviour
         VirtualMove(novaPosicao);
         Materializa();
     }
-
+    
     //muda o atributo 'posicao' mas não desloca o quadrado de fato
     public void VirtualMove(Vector2Int novaPosicao)
     {

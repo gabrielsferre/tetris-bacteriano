@@ -22,6 +22,9 @@ public class Grade : MonoBehaviour {
     //dicionario com os prefabs de cada tipo de peça
     public Peca[] prefabs = new Peca[(int)TipoPeca.NUM_TIPOS];
 
+    //objeto que spawna peças
+    public SpawnPecas spawn { get; set; }
+
     private void Awake()
     {
         MontaGrade();
@@ -79,6 +82,9 @@ public class Grade : MonoBehaviour {
         
         //desce as linhas que estão em cima das peças apagadas
         DesceLinhas(linhaMax - naoApagadas, linhaMin, sequenciaDesce, listaMetodos);
+
+        //adiciona criação da próxima peça no final da lista de metodos
+        listaMetodos.Add(CriaPeca);
 
         sequenciaFade.Pause();
         sequenciaDesce.Pause();
@@ -252,11 +258,11 @@ public class Grade : MonoBehaviour {
     }
 
     /// <summary>
-    /// função temporária
+    /// Instancia a próxima peça da fila
     /// </summary>
-    public void CriaPeca()
+    private void CriaPeca()
     {
-        TipoPeca tipo = (TipoPeca)UnityEngine.Random.Range(0, (int)TipoPeca.NUM_TIPOS);
+        TipoPeca tipo = spawn.ProximaPeca();
         //TipoPeca tipo = TipoPeca.I;
         Instantiate(prefabs[(int)tipo], transform);
     }
