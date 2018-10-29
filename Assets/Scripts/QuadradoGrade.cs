@@ -13,22 +13,46 @@ public enum Preenchimento
 //Quadrado da grade
 public class QuadradoGrade : MonoBehaviour {
 
+    string nomeQuadradoPeca = "QuadradoPeca";
+    string nomeQuadradoBacteria = "QuadradoBacteria";
+
     //qual eh o preenchimento do quadrado
     public Preenchimento interior { get; private set;}
 
     //quadrado de peca que o preenche o espaço
-    public QuadradoPeca quadradoPeca { get; private set; }
+    public Quadrado quadradoPeca { get; private set; }
+
+    //vetor que indica em que linha (coordenada x) e em que coluna (coordenada y) o quadrado se encontra
+    public Vector2Int posicao;
 
     /// <summary>
-    /// Preenche o quadrado com uma certa peça e atualiza
-    /// o preenchimento
+    /// Preenche o quadrado com uma certa peça ou bactéria e atualiza
+    /// o preenchimento. Também atualiza a posicao da peça ou bactéria
+    /// com a posição do quadrado.
     /// </summary>
     /// <param name="quadrado"></param>
-    public void Preenche(QuadradoPeca quadrado)
+    public void Preenche(Quadrado quadrado)
     {
+        quadrado.posicao = posicao;
         quadradoPeca = quadrado;
-        interior = Preenchimento.Peca;
         quadrado.transform.position = transform.position - Vector3.forward;
+
+        //se quadrado for de uma peça
+        if (quadrado.GetType().Name == nomeQuadradoPeca)
+        {
+            interior = Preenchimento.Peca;
+        }
+
+        //se quadrado for de uma bactéria
+        else if(quadrado.GetType().Name == nomeQuadradoBacteria)
+        {
+            interior = Preenchimento.Bacteria;
+        }
+
+        else
+        {
+            Debug.Log("Erro: quadrado não é de nenhum tipo reconhecido");
+        }
     }
 
     /// <summary>

@@ -12,7 +12,7 @@ public class Efeitos {
     /// Faz o quadrado brilhar e desaparecer gradativamente
     /// </summary>
     /// <param name="quadrado"></param>
-	private static Tweener FadeQuadrado( QuadradoPeca quadrado)
+	private static Tweener FadeQuadrado( Quadrado quadrado)
     {
         if (quadrado != null)
         {
@@ -67,7 +67,7 @@ public class Efeitos {
     /// <param name="posInicial"></param>
     /// <param name="posFinal"></param>
     /// <returns></returns>
-    public static Tweener MoveQuadrado( QuadradoPeca quadrado, float posInicial, float posFinal )
+    public static Tweener MoveQuadrado( Quadrado quadrado, float posInicial, float posFinal )
     {
         float tempo = Mathf.Abs(posFinal - posInicial) / velocidadeQueda;
         return quadrado.transform.DOMoveY(posFinal, tempo);

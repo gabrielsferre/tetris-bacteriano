@@ -53,7 +53,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   quadrado: {fileID: 114809432152722540, guid: 4f827a9266cffbb459fb2adbb794a665, type: 2}
-  peca: {fileID: 114593992832099984, guid: c5cca3caaa48f6e40875e4030865d584, type: 2}
+  prefabs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  quadradoBacteria: {fileID: 114786712450836604, guid: fd8da2431f15be648a1e311a518e4d92,
+    type: 2}
 --- !u!114 &114908780054503186
 MonoBehaviour:
   m_ObjectHideFlags: 1

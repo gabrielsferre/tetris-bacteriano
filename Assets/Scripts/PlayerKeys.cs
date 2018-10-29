@@ -22,4 +22,14 @@ public class PlayerKeys : MonoBehaviour {
         if (Input.GetKeyDown(esquerda)) return -1;
         return 0;
     }
+
+    //código temporário para testes
+    public bool GetZ()
+    {
+        return Input.GetKeyDown("z");
+    }
+    public bool GetX()
+    {
+        return Input.GetKeyDown("x");
+    }
 }

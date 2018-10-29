@@ -22,6 +22,9 @@ public class Grade : MonoBehaviour {
     //dicionario com os prefabs de cada tipo de peça
     public Peca[] prefabs = new Peca[(int)TipoPeca.NUM_TIPOS];
 
+    //prefab de bactéria
+    public QuadradoBacteria quadradoBacteria;
+
     //objeto que spawna peças
     public SpawnPecas spawn { get; set; }
 
@@ -33,6 +36,11 @@ public class Grade : MonoBehaviour {
     private void Start()
     {
         CriaPeca();
+    }
+
+    private void Update()
+    {
+        HandleInput();
     }
 
     /// <summary>
@@ -52,6 +60,7 @@ public class Grade : MonoBehaviour {
             {
                 QuadradoGrade novoQuadrado = Instantiate(quadrado, transform.position + new Vector3(tamanho * j, -tamanho * i, 0), Quaternion.identity, transform);
                 novoQuadrado.Esvazia();
+                novoQuadrado.posicao = new Vector2Int(i, j);
                 quadrados[i][j] = novoQuadrado;
             }
         }
@@ -145,7 +154,7 @@ public class Grade : MonoBehaviour {
     }
 
     /// <summary>
-    /// Checa se linha está completa
+    /// Checa se linha está completa com peças (bactérias não contam).
     /// </summary>
     /// <param name="linha"></param>
     /// <returns></returns>
@@ -160,6 +169,15 @@ public class Grade : MonoBehaviour {
             }
         }
         return true;
+    }
+
+    /// <summary>
+    /// Checa se existe algum quadrado de peça ou bactéria na linha superior de um certa coluna.
+    /// </summary>
+    /// <returns></returns>
+    private bool ColunaCheia(int coluna)
+    {
+        return quadrados[0][coluna].interior != Preenchimento.Livre;
     }
 
     /// <summary>
@@ -218,7 +236,7 @@ public class Grade : MonoBehaviour {
                 if (quadradoOrigem.quadradoPeca != null)
                 {
                     //copia peça do quadrado de origem para o quadrado destino
-                    quadradoDestino.Preenche(Instantiate(quadradoOrigem.quadradoPeca));
+                    quadradoDestino.Preenche(Instantiate(quadradoOrigem.quadradoPeca, transform));
                 }
 
                 //apaga peça do quadrado de origem
@@ -265,5 +283,24 @@ public class Grade : MonoBehaviour {
         TipoPeca tipo = spawn.ProximaPeca();
         //TipoPeca tipo = TipoPeca.I;
         Instantiate(prefabs[(int)tipo], transform);
+    }
+
+    /// <summary>
+    /// Cria bactéria que cai do céu
+    /// </summary>
+    private void CriaBacteria()
+    {
+        int coluna =  UnityEngine.Random.Range(0,colunas);
+        QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
+        bacteria.desceBacteria(coluna);
+    }
+
+
+    //código temporário para testes
+    private void HandleInput()
+    {
+        PlayerKeys playerKeys = GetComponent<PlayerKeys>();
+
+        if (playerKeys.GetZ()) CriaBacteria();
     }
 }
