@@ -32,4 +32,8 @@ public class PlayerKeys : MonoBehaviour {
     {
         return Input.GetKeyDown("x");
     }
+    public bool GetR()
+    {
+        return Input.GetKeyDown("r");
+    }
 }

@@ -286,15 +286,16 @@ public class Grade : MonoBehaviour {
     }
 
     /// <summary>
-    /// Cria bactéria que cai do céu
+    /// Cria bactéria fora da grade e faz ela cair até
+    /// encontrar outro bloco ou o fim da grade.
     /// </summary>
     private void CriaBacteria()
     {
         int coluna =  UnityEngine.Random.Range(0,colunas);
         QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
-        bacteria.desceBacteria(coluna);
-    }
 
+        bacteria.DesceBacteria(coluna);
+    }
 
     //código temporário para testes
     private void HandleInput()
@@ -302,5 +303,18 @@ public class Grade : MonoBehaviour {
         PlayerKeys playerKeys = GetComponent<PlayerKeys>();
 
         if (playerKeys.GetZ()) CriaBacteria();
+        if (playerKeys.GetR()) LimpaTela();
+    }
+
+    private void LimpaTela()
+    {
+        //posiciona quadrados
+        for (int i = 0; i < linhas; i++)
+        {
+            for (int j = 0; j < colunas; j++)
+            {
+                quadrados[i][j].Esvazia();
+            }
+        }
     }
 }

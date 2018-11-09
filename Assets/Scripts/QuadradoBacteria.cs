@@ -13,20 +13,50 @@ public class QuadradoBacteria : Quadrado {
     /// Desce bactéria em dada coluna até ela encontrar um compartimento da grade já ocupado.
     /// Se o compartimento da linha superior da grade já estiver preenchido, deleta bactéria.
     /// </summary>    
-    public void desceBacteria(int coluna)
+    public void DesceBacteria(int coluna)
+    {
+        QuadradoGrade quadrado = QuadradoDesceBacteria(coluna);
+        
+        if(quadrado == null)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            //coloca bactéria na grade
+            quadrado.Preenche(this);
+
+            //tamanho de uma célula da grade
+            float tamanho = quadrado.GetComponent<SpriteRenderer>().bounds.size.y;
+
+            //posição do acima da grade na dada coluna
+            Vector3 posicaoInicial = grade.quadrados[0][coluna].transform.position + new Vector3(0, tamanho, -1);
+
+            //coloca bactéria acima da tela
+            transform.position = posicaoInicial;
+
+            //cria animação de queda da bactéria
+            Efeitos.MoveBacteria(this, transform.position.y, quadrado.transform.position.y);
+        }
+    }
+
+    /// <summary>
+    /// Da o quadrado da grade que será preenchido por DesceBactéria
+    /// </summary>
+    public QuadradoGrade QuadradoDesceBacteria(int coluna)
     {
         //pega posição acima do compartimento da grade ocupado
-        int linha = primeiraLinhaOcupada(coluna) - 1;
+        int linha = PrimeiraLinhaOcupada(coluna) - 1;
 
         //se linha superior estava ocupada
         if (linha < 0)
         {
-            Destroy(gameObject);
+            return null;
         }
 
         else
         {
-            grade.quadrados[linha][coluna].Preenche(this);
+            return grade.quadrados[linha][coluna];
         }
     }
 
@@ -36,7 +66,7 @@ public class QuadradoBacteria : Quadrado {
     /// </summary>
     /// <param name="coluna"></param>
     /// <returns></returns>
-    private int primeiraLinhaOcupada(int coluna)
+    private int PrimeiraLinhaOcupada(int coluna)
     {
         int i;
 
@@ -58,17 +88,33 @@ public class QuadradoBacteria : Quadrado {
     /// <returns></returns>
     private void TransformaAdjacentes()
     {
-        SubstituiPeca(posicao + new Vector2Int(1, 0));
-        SubstituiPeca(posicao + new Vector2Int(-1, 0));
-        SubstituiPeca(posicao + new Vector2Int(0, 1));
-        SubstituiPeca(posicao + new Vector2Int(0, -1));
+        //float aleatório entre 0 e 1
+        float sorteado = Random.Range(0, 1f);
+
+        if (sorteado < 0.5)
+        {
+            //se não for possível substituir a peça
+            if (!SubstituiPeca(posicao + new Vector2Int(0, 1)))
+            {
+                SubstituiPeca(posicao + new Vector2Int(0, -1));
+            }
+        }
+        else
+        {
+            //se não for possível substituir a peça
+            if(!SubstituiPeca(posicao + new Vector2Int(0, -1)))
+            {
+                SubstituiPeca(posicao + new Vector2Int(0, 1));
+            }
+        }
     }
 
     /// <summary>
     /// Substitui peça em certa posição por bactéria.
     /// Não faz nada se nenhuma peça estiver naquela posição.
+    /// Retorna se foi capaz de substituir alguma peça ou não.
     /// </summary>
-    private void SubstituiPeca(Vector2Int posicao)
+    private bool SubstituiPeca(Vector2Int posicao)
     {
         //se posição for válida
         if (ValidaPosicao(posicao))
@@ -77,7 +123,11 @@ public class QuadradoBacteria : Quadrado {
 
             quadradoGrade.Esvazia();
             quadradoGrade.Preenche(Instantiate(this, transform.parent));
+
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>

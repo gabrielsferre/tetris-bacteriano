@@ -19,7 +19,7 @@ public class QuadradoGrade : MonoBehaviour {
     //qual eh o preenchimento do quadrado
     public Preenchimento interior { get; private set;}
 
-    //quadrado de peca que o preenche o espaço
+    //quadrado de peca ou bacteria que preenche o espaço
     public Quadrado quadradoPeca { get; private set; }
 
     //vetor que indica em que linha (coordenada x) e em que coluna (coordenada y) o quadrado se encontra
