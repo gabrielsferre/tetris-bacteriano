@@ -23,6 +23,31 @@ public class PlayerKeys : MonoBehaviour {
         return 0;
     }
 
+    public bool GetDown()
+    {
+        return Input.GetKey(baixo);
+    }
+
+    public bool GetLeft()
+    {
+        return Input.GetKey(esquerda);
+    }
+
+    public bool GetRight()
+    {
+        return Input.GetKey(direita);
+    }
+
+    public bool GetLeftReleased()
+    {
+        return Input.GetKeyUp(esquerda);
+    }
+
+    public bool GetRightReleased()
+    {
+        return Input.GetKeyUp(direita);
+    }
+
     //código temporário para testes
     public bool GetZ()
     {

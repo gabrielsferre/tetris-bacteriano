@@ -7,7 +7,15 @@ using UnityEngine;
 public class Peca : MonoBehaviour {
 
     //tempo entre as "quedas" sucessivas da peca em segundos
-    public const float tempoQueda = 0.5f;
+    public const float tempoQueda = 0.7f;
+    //tempo de queda para quando o botão de descida estiver pressionado
+    public const float tempoQuedaReduzido = 0.05f;
+
+    //tempo para movimentação lateral quando o botão é pressionado
+    public const float tempoSlide = 0.05f;
+
+    //delay para o slide começar
+    public const float slideDelay = 0.5f;
 
     //array com quadrados que compõe a peca
     public QuadradoPeca[] quadrados = new QuadradoPeca[4];
@@ -38,7 +46,8 @@ public class Peca : MonoBehaviour {
     {
         CriaPeca();
 
-        //InvokeRepeating("MoveBaixo", tempoQueda, tempoQueda);
+        //coroutine que faz peça cair
+        StartCoroutine("DescePeca");
     }
 
     private void Update()
@@ -86,6 +95,42 @@ public class Peca : MonoBehaviour {
     protected void MoveDireita()
     {
         MovePecaCheck( new Vector2Int(0, 1) );
+    }
+
+    /// <summary>
+    /// Coroutine que faz peça continuar movimento para esquerda botão direcional
+    /// estiver pressionado. Se esquerda e direita estiverem pressionados juntos,
+    /// peça para.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator SlideEsquerda()
+    {
+        yield return new WaitForSeconds(slideDelay);
+
+        while( playerKeys.GetLeft() )
+        {
+            yield return new WaitForSeconds(tempoSlide);
+
+            MoveEsquerda();
+        } 
+    }
+
+    /// <summary>
+    /// Coroutine que faz peça continuar movimento para direita botão direcional
+    /// estiver pressionado. Se esquerda e direita estiverem pressionados juntos,
+    /// peça para.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator SlideDireita()
+    {
+        yield return new WaitForSeconds(slideDelay);
+
+        while( playerKeys.GetRight() )
+        {
+            yield return new WaitForSeconds(tempoSlide);
+
+            MoveDireita();
+        }
     }
 
     //move peca apenas se a nova posicao for válida
@@ -160,6 +205,29 @@ public class Peca : MonoBehaviour {
         if( !MovePecaCheck( new Vector2Int(1,0)) )
         {
             PecaPosicionada();
+        }
+    }
+
+    /// <summary>
+    /// Coroutine que faz peça descer periodicamente.
+    /// A peça desce mais rápido caso o botão de descer esteja pressionado.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator DescePeca()
+    {
+        while (gameObject != null)
+        {
+            //se botão de descida estiver pressionado
+            if ( playerKeys.GetDown() )
+            {
+                yield return new WaitForSeconds(tempoQuedaReduzido);
+            }
+            else
+            {
+                yield return new WaitForSeconds(tempoQueda);
+            }
+            
+            MoveBaixo();
         }
     }
 
@@ -268,15 +336,49 @@ public class Peca : MonoBehaviour {
         return true;
     }
 
+    /// <summary>
+    /// Faz com que a aceleração da queda seja instantânea ao se pressionar
+    /// o botão de descida.
+    /// </summary>
+    /// <returns></returns>
+    private void DownPressed()
+    {
+        StopCoroutine("DescePeca");
+        StartCoroutine("DescePeca");
+    }
+
+    /// <summary>
+    /// Move peça para a esquerda e garante que não vá se mover
+    /// para a direita.
+    /// </summary>
+    private void LeftPressed()
+    {
+        MoveEsquerda();
+        StartCoroutine("SlideEsquerda");
+        StopCoroutine("SlideDireita");
+    }
+
+
+    /// <summary>
+    /// Move peça para a direita e garante que não vá se mover
+    /// para a esquerda.
+    /// </summary>
+    private void RightPressed()
+    {
+        MoveDireita();
+        StartCoroutine("SlideDireita");
+        StopCoroutine("SlideEsquerda");
+    }
+
     private void HandleInput()
     {
         if( playerKeys.GetRawHorizontal() == 1)
         {
-            MoveDireita();
+            RightPressed();
         }
         else if( playerKeys.GetRawHorizontal() == -1)
         {
-            MoveEsquerda();
+            LeftPressed();
         }
         else if( playerKeys.GetRawVertical() == 1)
         {
@@ -284,7 +386,15 @@ public class Peca : MonoBehaviour {
         }
         else if (playerKeys.GetRawVertical() == -1)
         {
-            MoveBaixo();
+            DownPressed();
+        }
+        else if (playerKeys.GetLeftReleased())
+        {
+            StopCoroutine("SlideEsquerda");
+        }
+        else if (playerKeys.GetRightReleased())
+        {
+            StopCoroutine("SlideDireita");
         }
     }
 }
