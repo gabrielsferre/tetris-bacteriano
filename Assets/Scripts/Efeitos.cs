@@ -6,13 +6,14 @@ using DG.Tweening;
 public class Efeitos {
 
     const float tempoFade = 0.5f;
-    const float velocidadeQueda = 2f;
+    const float velocidadeQuedaLinha = 2f;
+    const float velocidadeQuedaBacteria = 8f;
 
     /// <summary>
     /// Faz o quadrado brilhar e desaparecer gradativamente
     /// </summary>
     /// <param name="quadrado"></param>
-	private static Tweener FadeQuadrado( QuadradoPeca quadrado)
+	private static Tweener FadeQuadrado( Quadrado quadrado)
     {
         if (quadrado != null)
         {
@@ -61,15 +62,28 @@ public class Efeitos {
     }
 
     /// <summary>
+    /// Cria tween que move a bactéria de "posInicial" para "posFinal"
+    /// </summary>
+    /// <param name="quadrado"></param>
+    /// <param name="posInicial"></param>
+    /// <param name="posFinal"></param>
+    /// <returns></returns>
+    public static Tweener MoveBacteria(QuadradoBacteria quadrado, float posInicial, float posFinal)
+    {
+        float tempo = Mathf.Abs(posFinal - posInicial) / velocidadeQuedaBacteria;
+        return quadrado.transform.DOMoveY(posFinal, tempo);
+    }
+
+    /// <summary>
     /// Cria tween que move o quadrado de "posInicial" para "posFinal"
     /// </summary>
     /// <param name="quadrado"></param>
     /// <param name="posInicial"></param>
     /// <param name="posFinal"></param>
     /// <returns></returns>
-    public static Tweener MoveQuadrado( QuadradoPeca quadrado, float posInicial, float posFinal )
+    public static Tweener MoveQuadrado( Quadrado quadrado, float posInicial, float posFinal )
     {
-        float tempo = Mathf.Abs(posFinal - posInicial) / velocidadeQueda;
+        float tempo = Mathf.Abs(posFinal - posInicial) / velocidadeQuedaLinha;
         return quadrado.transform.DOMoveY(posFinal, tempo);
     }
 
