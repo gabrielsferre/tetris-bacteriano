@@ -10,9 +10,6 @@ public class Grade : MonoBehaviour {
     public const int linhas = 20;
     public const int colunas = 10;
 
-    //lado dos quadrados que compõem a grade
-    public const float lado = 0.75f;
-
     //matriz com quadrados
     public QuadradoGrade[][] quadrados = new QuadradoGrade[linhas][];
 
@@ -49,8 +46,8 @@ public class Grade : MonoBehaviour {
     private void MontaGrade()
     {
         //define tamanho dos quadrados
-        quadrado.transform.localScale = new Vector3(lado, lado, 0);
-        float tamanho = quadrado.GetComponent<SpriteRenderer>().bounds.size.x;
+        float tamanhoX = quadrado.GetComponent<SpriteRenderer>().bounds.size.x * transform.localScale.x;
+        float tamanhoY = quadrado.GetComponent<SpriteRenderer>().bounds.size.y * transform.localScale.y;
 
         //posiciona quadrados
         for ( int i = 0; i < linhas; i++ )
@@ -58,7 +55,7 @@ public class Grade : MonoBehaviour {
             quadrados[i] = new QuadradoGrade[colunas];
             for( int j = 0; j < colunas; j++)
             {
-                QuadradoGrade novoQuadrado = Instantiate(quadrado, transform.position + new Vector3(tamanho * j, -tamanho * i, 0), Quaternion.identity, transform);
+                QuadradoGrade novoQuadrado = Instantiate(quadrado, transform.position + new Vector3(tamanhoX * j, -tamanhoY * i, 0), Quaternion.identity, transform);
                 novoQuadrado.Esvazia();
                 novoQuadrado.posicao = new Vector2Int(i, j);
                 quadrados[i][j] = novoQuadrado;

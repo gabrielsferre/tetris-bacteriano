@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
     
     //Grade onde ficam as peças
-    public Grade grade;
+    private Grade grade;
 
     //Spawn de peças
     private SpawnPecas spawn;
@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour {
     private void Awake()
     {
         spawn = new SpawnPecas();
+
+        grade = FindObjectOfType<Grade>();
 
         Init();
     }

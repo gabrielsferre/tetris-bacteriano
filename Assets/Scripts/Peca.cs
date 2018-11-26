@@ -60,7 +60,7 @@ public class Peca : MonoBehaviour {
     {
         for( int i = 0; i < quadrados.Length; i++ )
         {
-            quadrados[i] = Instantiate(prefabQuadrado);
+            quadrados[i] = Instantiate(prefabQuadrado, grade.transform);
         }
 
         MontaPeca();
