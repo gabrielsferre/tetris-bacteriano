@@ -25,14 +25,14 @@ public class Grade : MonoBehaviour {
     //objeto que spawna peças
     public SpawnPecas spawn { get; set; }
 
+    //instancia do game manager
+    private GameManager gameManager;
+
     private void Awake()
     {
         MontaGrade();
-    }
 
-    private void Start()
-    {
-        CriaPeca();
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     private void Update()
@@ -90,7 +90,7 @@ public class Grade : MonoBehaviour {
         DesceLinhas(linhaMax - naoApagadas, linhaMin, sequenciaDesce, listaMetodos);
 
         //adiciona criação da próxima peça no final da lista de metodos
-        listaMetodos.Add(CriaPeca);
+        listaMetodos.Add(() => StartCoroutine(gameManager.SegueLoopTetris()));
 
         sequenciaFade.Pause();
         sequenciaDesce.Pause();
@@ -275,8 +275,8 @@ public class Grade : MonoBehaviour {
     /// <summary>
     /// Instancia a próxima peça da fila
     /// </summary>
-    private void CriaPeca()
-    {
+    public void CriaPeca()
+    {   
         TipoPeca tipo = spawn.ProximaPeca();
         //TipoPeca tipo = TipoPeca.I;
         Instantiate(prefabs[(int)tipo], transform);
@@ -286,7 +286,7 @@ public class Grade : MonoBehaviour {
     /// Cria bactéria fora da grade e faz ela cair até
     /// encontrar outro bloco ou o fim da grade.
     /// </summary>
-    private void CriaBacteria()
+    public void CriaBacteria()
     {
         int coluna =  UnityEngine.Random.Range(0,colunas);
         QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
