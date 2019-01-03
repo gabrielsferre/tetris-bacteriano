@@ -61,4 +61,8 @@ public class PlayerKeys : MonoBehaviour {
     {
         return Input.GetKeyDown("r");
     }
+    public bool GetC()
+    {
+        return Input.GetKeyDown("c");
+    }
 }

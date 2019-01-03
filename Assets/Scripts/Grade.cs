@@ -22,6 +22,9 @@ public class Grade : MonoBehaviour {
     //prefab de bactéria
     public QuadradoBacteria quadradoBacteria;
 
+    //prefab de super bactéria
+    public QuadradoSuperBacteria quadradoSuperBacteria;
+
     //objeto que spawna peças
     public SpawnPecas spawn { get; set; }
 
@@ -294,12 +297,37 @@ public class Grade : MonoBehaviour {
         bacteria.DesceBacteria(coluna);
     }
 
+    /// <summary>
+    /// Cria bactéria fora da grade e faz ela cair até
+    /// encontrar outro bloco ou o fim da grade.
+    /// </summary>
+    public void CriaSuperBacteria()
+    {
+        int coluna = UnityEngine.Random.Range(0, colunas);
+        QuadradoSuperBacteria bacteria = Instantiate(quadradoSuperBacteria, transform);
+
+        bacteria.DesceBacteria(coluna);
+    }
+
+    /// <summary>
+    /// Transforma em bactéria peças que estejam do lado de bactérias.
+    /// </summary>
+    public void InfectaPecas()
+    {
+        foreach( QuadradoBacteria bacteria in FindObjectsOfType<QuadradoBacteria>())
+        {
+            bacteria.TransformaAdjacentes();
+        }
+    }
+
     //código temporário para testes
     private void HandleInput()
     {
         PlayerKeys playerKeys = GetComponent<PlayerKeys>();
 
         if (playerKeys.GetZ()) CriaBacteria();
+        if (playerKeys.GetC()) CriaSuperBacteria();
+        if (playerKeys.GetX()) InfectaPecas();
         if (playerKeys.GetR()) LimpaTela();
     }
 
