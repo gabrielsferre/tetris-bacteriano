@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour {
     //objeto usado nos yields ao longo da corrotina LoopJogo
     private int numeroPecas = 0;
 
+	public CaixaDeDialogo caixaDeDialogo;
+
+	public MedidorDeRemedio medidor;
+
     private void Awake()
     {
         //inicializa grade
@@ -186,14 +190,7 @@ public class GameManager : MonoBehaviour {
             this.mensagem = mensagem;
             tempoInicial = Time.time;
 
-            if (tipo == TipoDeTexto.FALA)
-            {
-                print("Fala: " + mensagem);
-            }
-            if (tipo == TipoDeTexto.RESPOSTA)
-            {
-                print("Resposta: " + mensagem);
-            }
+			gameManager.caixaDeDialogo.ImprimeTexto(tipo, mensagem);
         }
     }
 
@@ -206,7 +203,7 @@ public class GameManager : MonoBehaviour {
 
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
-        int nivel;
+        float nivel;
 
         public override bool keepWaiting
         {
@@ -223,14 +220,14 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        public RegulaMedidor(GameManager gameManager, float tempo, int nivel)
+        public RegulaMedidor(GameManager gameManager, float tempo, float nivel)
         {
             this.gameManager = gameManager;
             this.tempo = tempo;
             this.nivel = nivel;
             tempoInicial = Time.time;
 
-            print("Medidor regulado");
+			gameManager.medidor.Quantidade = nivel;
         }
     }
 
@@ -240,10 +237,14 @@ public class GameManager : MonoBehaviour {
     private IEnumerator SequenciaJogo()
     {
         yield return new LoopTetris(this, 2);
-        yield return new EnviaMensagem(this, 1,TipoDeTexto.FALA, "Estou passando mal");
-        yield return new EnviaMensagem(this, 1, TipoDeTexto.RESPOSTA, "Toma antibiótico");
         yield return new CriaBacteria(this, 1);
-        yield return new InfectaPecas(this, 1);
-        yield return new LoopTetris(this, 4);
-    }
+		yield return new LoopTetris(this, 3);
+		yield return new InfectaPecas(this, 1);
+		yield return new EnviaMensagem(this, 1,TipoDeTexto.FALA, "Estou passando mal");
+        yield return new EnviaMensagem(this, 1, TipoDeTexto.RESPOSTA, "Toma antibiótico");
+		yield return new RegulaMedidor(this, 1, 0.7f);
+        yield return new LoopTetris(this, 20);
+		yield return new RegulaMedidor(this, 1, 0.5f);
+
+	}
 }
