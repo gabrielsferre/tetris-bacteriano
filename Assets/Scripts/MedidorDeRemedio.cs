@@ -86,6 +86,11 @@ public class MedidorDeRemedio : MonoBehaviour {
 
     }
 
+	public bool CheckQuantidadeMinima()
+	{
+		return Quantidade >= quantidadeMinima;
+	}
+
     private void Update()
     {
         if (Input.GetKeyDown("5"))

@@ -22,9 +22,6 @@ public class Grade : MonoBehaviour {
     //prefab de bactéria
     public QuadradoBacteria quadradoBacteria;
 
-    //prefab de super bactéria
-    public QuadradoSuperBacteria quadradoSuperBacteria;
-
     //objeto que spawna peças
     public SpawnPecas spawn { get; set; }
 
@@ -304,9 +301,35 @@ public class Grade : MonoBehaviour {
     public void CriaSuperBacteria()
     {
         int coluna = UnityEngine.Random.Range(0, colunas);
-        QuadradoSuperBacteria bacteria = Instantiate(quadradoSuperBacteria, transform);
+        QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
+        bacteria.ViraSuperBacteria();
 
         bacteria.DesceBacteria(coluna);
+    }
+
+    /// <summary>
+    /// Cria linha de bactérias normais que caem ao longo da grade
+    /// </summary>
+    public void CriaLinhaBacteria()
+    {
+        for( int coluna = 0; coluna < colunas; coluna++ )
+        {
+            QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
+            bacteria.DesceBacteria(coluna);
+        }
+    }
+
+    /// <summary>
+    /// Cria linha de super bactérias que caem ao longo da grade
+    /// </summary>
+    public void CriaLinhaSuperBacteria()
+    {
+        for (int coluna = 0; coluna < colunas; coluna++)
+        {
+            QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
+            bacteria.ViraSuperBacteria();
+            bacteria.DesceBacteria(coluna);
+        }
     }
 
     /// <summary>
