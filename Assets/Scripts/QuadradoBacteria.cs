@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class QuadradoBacteria : Quadrado {
 
-    private void Update()
-    {
-        HandleInput();
-    }
-
     /// <summary>
     /// Desce bactéria em dada coluna até ela encontrar um compartimento da grade já ocupado.
     /// Se o compartimento da linha superior da grade já estiver preenchido, deleta bactéria.
@@ -86,7 +81,7 @@ public class QuadradoBacteria : Quadrado {
     /// Transforma peças adjacentes à bactéria em bactérias
     /// </summary>
     /// <returns></returns>
-    private void TransformaAdjacentes()
+    public void TransformaAdjacentes()
     {
         //float aleatório entre 0 e 1
         float sorteado = Random.Range(0, 1f);
@@ -158,17 +153,5 @@ public class QuadradoBacteria : Quadrado {
         bool checaLinha = (posicao.x >= 0 && posicao.x < Grade.linhas);
         bool checaColuna = (posicao.y >= 0 && posicao.y < Grade.colunas);
         return checaLinha && checaColuna;
-    }
-
-
-    //código temporário para testes
-    private void HandleInput()
-    {
-        PlayerKeys playerKeys = GetComponentInParent<PlayerKeys>();
-
-        if (playerKeys.GetX())
-        {
-            TransformaAdjacentes();
-        }
     }
 }
