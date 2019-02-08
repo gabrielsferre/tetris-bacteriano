@@ -10,6 +10,9 @@ public class Grade : MonoBehaviour {
     public const int linhas = 20;
     public const int colunas = 10;
 
+    //delay entre bacterias serem enfraquecidas e elas poderem apagar
+    public const float delayEnfraquecimento = 1f;
+
     //matriz com quadrados
     public QuadradoGrade[][] quadrados = new QuadradoGrade[linhas][];
 
@@ -21,9 +24,6 @@ public class Grade : MonoBehaviour {
 
     //prefab de bactéria
     public QuadradoBacteria quadradoBacteria;
-
-    //prefab de super bactéria
-    public QuadradoSuperBacteria quadradoSuperBacteria;
 
     //objeto que spawna peças
     public SpawnPecas spawn { get; set; }
@@ -154,7 +154,7 @@ public class Grade : MonoBehaviour {
     }
 
     /// <summary>
-    /// Checa se linha está completa com peças (bactérias não contam).
+    /// Checa se linha está completa com peças e/ou bactérias engraquecidas.
     /// </summary>
     /// <param name="linha"></param>
     /// <returns></returns>
@@ -162,11 +162,24 @@ public class Grade : MonoBehaviour {
     {
         for( int j = 0; j < colunas; j++)
         {
-            //caso campo da grade não esteja preenchido por uma peça
-            if( quadrados[linha][j].interior != Preenchimento.Peca)
+            QuadradoGrade quadrado = quadrados[linha][j];
+
+            //caso campo da grade esteja vazio
+            if (quadrado.interior == Preenchimento.Livre)
             {
                 return false;
             }
+            
+            //caso campo esteja preenchido por uma bactéria
+            if (quadrado.interior == Preenchimento.Bacteria)
+            {
+                //caso bactéria não esteja enfraquecida
+                if (!((QuadradoBacteria)quadrado.quadradoPeca).bacteriaEnfraquecida)
+                {
+                    return false;
+                }
+            }
+            
         }
         return true;
     }
@@ -304,9 +317,35 @@ public class Grade : MonoBehaviour {
     public void CriaSuperBacteria()
     {
         int coluna = UnityEngine.Random.Range(0, colunas);
-        QuadradoSuperBacteria bacteria = Instantiate(quadradoSuperBacteria, transform);
+        QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
+        bacteria.ViraSuperBacteria();
 
         bacteria.DesceBacteria(coluna);
+    }
+
+    /// <summary>
+    /// Cria linha de bactérias normais que caem ao longo da grade
+    /// </summary>
+    public void CriaLinhaBacteria()
+    {
+        for( int coluna = 0; coluna < colunas; coluna++ )
+        {
+            QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
+            bacteria.DesceBacteria(coluna);
+        }
+    }
+
+    /// <summary>
+    /// Cria linha de super bactérias que caem ao longo da grade
+    /// </summary>
+    public void CriaLinhaSuperBacteria()
+    {
+        for (int coluna = 0; coluna < colunas; coluna++)
+        {
+            QuadradoBacteria bacteria = Instantiate(quadradoBacteria, transform);
+            bacteria.ViraSuperBacteria();
+            bacteria.DesceBacteria(coluna);
+        }
     }
 
     /// <summary>
@@ -318,6 +357,63 @@ public class Grade : MonoBehaviour {
         {
             bacteria.TransformaAdjacentes();
         }
+    }
+
+    /// <summary>
+    /// Faz com que determinadas bactérias possam ser eliminadas e
+    /// apaga linhas que tenham se tornado completas.
+    /// Retorna 'true' se alguma linha for apagada.
+    /// </summary>
+    public bool EnfraqueceBacterias(TipoBacteria tipoBacteria)
+    {
+        //transforma bactérias
+        for(int linha = 0; linha < linhas; linha++)
+        {
+            for(int coluna = 0; coluna < colunas; coluna++)
+            {
+                QuadradoGrade quadradoGrade = quadrados[linha][coluna];
+
+                //se celula contiver uma bactéria
+                if( quadradoGrade.interior == Preenchimento.Bacteria)
+                {
+                    QuadradoBacteria bacteria = (QuadradoBacteria)quadradoGrade.quadradoPeca;
+
+                    //se bactérica for menos ou igualmente forte ao tipo especificado
+                    if( tipoBacteria == TipoBacteria.SuperBacteria || tipoBacteria == bacteria.tipoBacteria)
+                    {
+                        bacteria.EnfraqueceBacteria();
+                    }
+                }
+            }
+        }
+
+        //completa linhas
+
+        Sequence sequenciaFade = DOTween.Sequence();    //sequencia usada para dar o fade nas linhas apagadas
+        Sequence sequenciaDesce = DOTween.Sequence();   //sequencia usada para fazer as linhas caírem
+
+        //Fila de métodos que serão executados após fim das animações de queda das peças
+        //São métodos que apagam as peças que devem ser pagadas e descem as peças que devem cair
+        List<Action> listaMetodos = new List<Action>();
+
+        //começa animação de queda das peças depois que as linhas completas desaparecerem
+        sequenciaFade.OnComplete(() => sequenciaDesce.Play());
+
+        //executa métodos da fila após fim da animação de queda
+        sequenciaDesce.OnComplete(() => listaMetodos.ForEach(action => action()));
+
+        //apaga linhas completas
+        int naoApagadas = ApagaCompletasDesceIncompletas(0, linhas-1, sequenciaFade, sequenciaDesce, listaMetodos); //número de linhas que não foram apagadas
+
+        //desce as linhas que estão em cima das peças apagadas
+        DesceLinhas(linhas - 1 - naoApagadas, 0, sequenciaDesce, listaMetodos);
+
+        sequenciaFade.Pause();
+        sequenciaDesce.Pause();
+
+        sequenciaFade.Play();
+
+        return naoApagadas < linhas;
     }
 
     //código temporário para testes

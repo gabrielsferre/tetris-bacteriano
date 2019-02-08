@@ -2,12 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum TipoBacteria
+{
+    Normal,
+    SuperBacteria
+};
+
 public class QuadradoBacteria : Quadrado {
+
+    public TipoBacteria tipoBacteria = TipoBacteria.Normal;
+
+    public bool bacteriaEnfraquecida = false;  //diz se bacteria pode ser eliminada
+
+    public Sprite spriteSuperBacteria;
+    public Sprite spriteBacteriaEnfraquecida;
 
     /// <summary>
     /// Desce bactéria em dada coluna até ela encontrar um compartimento da grade já ocupado.
     /// Se o compartimento da linha superior da grade já estiver preenchido, deleta bactéria.
-    /// </summary>    
+    /// </summary> 
     public void DesceBacteria(int coluna)
     {
         QuadradoGrade quadrado = QuadradoDesceBacteria(coluna);
@@ -78,29 +91,24 @@ public class QuadradoBacteria : Quadrado {
     }
 
     /// <summary>
-    /// Transforma peças adjacentes à bactéria em bactérias
+    /// Transforma peças adjacentes à bactéria em bactérias.
+    /// Só funciona se bactéria não estiver enfraquecida
     /// </summary>
     /// <returns></returns>
     public void TransformaAdjacentes()
     {
-        //float aleatório entre 0 e 1
-        float sorteado = Random.Range(0, 1f);
+        //se bactéria não estiver enfraquecida
+        if (!bacteriaEnfraquecida)
+        {
+            Vector2Int esquerda = posicao + new Vector2Int(0, -1);
+            Vector2Int direita = posicao + new Vector2Int(0, 1);
+            Vector2Int baixo = posicao + new Vector2Int(1, 0);
+            Vector2Int cima = posicao + new Vector2Int(-1, 0);
 
-        if (sorteado < 0.5)
-        {
-            //se não for possível substituir a peça
-            if (!SubstituiPeca(posicao + new Vector2Int(0, 1)))
-            {
-                SubstituiPeca(posicao + new Vector2Int(0, -1));
-            }
-        }
-        else
-        {
-            //se não for possível substituir a peça
-            if(!SubstituiPeca(posicao + new Vector2Int(0, -1)))
-            {
-                SubstituiPeca(posicao + new Vector2Int(0, 1));
-            }
+            if (SubstituiPeca(direita)) return;
+            else if (SubstituiPeca(esquerda)) return;
+            else if (SubstituiPeca(cima)) return;
+            else SubstituiPeca(baixo);
         }
     }
 
@@ -117,7 +125,15 @@ public class QuadradoBacteria : Quadrado {
             QuadradoGrade quadradoGrade = grade.quadrados[posicao.x][posicao.y];
 
             quadradoGrade.Esvazia();
-            quadradoGrade.Preenche(Instantiate(this, transform.parent));
+
+            QuadradoBacteria novaBacteria = Instantiate(this, transform.parent);
+            
+            if( tipoBacteria == TipoBacteria.SuperBacteria )
+            {
+                novaBacteria.ViraSuperBacteria();
+            }
+
+            quadradoGrade.Preenche(novaBacteria);
 
             return true;
         }
@@ -126,9 +142,7 @@ public class QuadradoBacteria : Quadrado {
     }
 
     /// <summary>
-    /// Retorna 'true' se posição não estiver fora dos limites da grade
-    /// e corresponder a um compartimento da grade preenchido por alguma 
-    /// peça.
+    /// Retorna true se a posição for passível de ser infectada.
     /// </summary>
     /// <returns></returns>
     private bool ValidaPosicao(Vector2Int posicao)
@@ -138,9 +152,31 @@ public class QuadradoBacteria : Quadrado {
         {
             return false;
         }
-        
-        //diz se posição está ocupada por alguma peça
-        return grade.quadrados[posicao.x][posicao.y].interior == Preenchimento.Peca;
+
+
+        QuadradoGrade quadradoGrade = grade.quadrados[posicao.x][posicao.y];
+
+        //posição não está ocupada por nada
+        if (quadradoGrade.interior == Preenchimento.Livre)
+        {
+            return false;
+        }
+
+        //posição está ocupada por alguma bacteria
+        if (quadradoGrade.interior == Preenchimento.Bacteria)
+        {
+            QuadradoBacteria bacteria = (QuadradoBacteria)quadradoGrade.quadradoPeca;
+
+            //se a bactéria nesta posicao for uma super bactéria
+            //ou bactéria que está tentando infectar esta posição for uma bactéria normal
+            if (bacteria.tipoBacteria == TipoBacteria.SuperBacteria || tipoBacteria == TipoBacteria.Normal)
+            {
+                return false;
+            }
+        }
+
+        //posição esta ocupada por 
+        return true;
     }
 
     /// <summary>
@@ -153,5 +189,23 @@ public class QuadradoBacteria : Quadrado {
         bool checaLinha = (posicao.x >= 0 && posicao.x < Grade.linhas);
         bool checaColuna = (posicao.y >= 0 && posicao.y < Grade.colunas);
         return checaLinha && checaColuna;
+    }
+
+    /// <summary>
+    /// Transforma bacteria em superbacteria
+    /// </summary>
+    public void ViraSuperBacteria()
+    {
+        GetComponent<SpriteRenderer>().sprite = spriteSuperBacteria;
+        tipoBacteria = TipoBacteria.SuperBacteria;
+    }
+
+    /// <summary>
+    /// Indica que bacteria pode ser apagado e muda sprite da mesma
+    /// </summary>
+    public void EnfraqueceBacteria()
+    {
+        GetComponent<SpriteRenderer>().sprite = spriteBacteriaEnfraquecida;
+        bacteriaEnfraquecida = true;
     }
 }

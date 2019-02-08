@@ -15,7 +15,6 @@ public class QuadradoGrade : MonoBehaviour {
 
     string nomeQuadradoPeca = "QuadradoPeca";
     string nomeQuadradoBacteria = "QuadradoBacteria";
-    string nomeQuadradoSuperBacteria = "QuadradoSuperBacteria";
 
     //qual eh o preenchimento do quadrado
     public Preenchimento interior { get; private set;}
@@ -45,8 +44,7 @@ public class QuadradoGrade : MonoBehaviour {
         }
 
         //se quadrado for de uma bactéria
-        else if(quadrado.GetType().Name == nomeQuadradoBacteria ||
-                quadrado.GetType().Name == nomeQuadradoSuperBacteria)
+        else if(quadrado.GetType().Name == nomeQuadradoBacteria)
         {
             interior = Preenchimento.Bacteria;
         }
