@@ -41,25 +41,19 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     public IEnumerator SegueLoopTetris()
     {
-        numeroPecas--;
+        yield return new WaitForSeconds(spawnDelay);
 
-        
+        numeroPecas--;
 
         if (numeroPecas > -1)
         {
-            yield return new WaitForSeconds(spawnDelay);
-
             grade.CriaPeca();
-        }
-        else
-        {
-            yield return null;
         }
     }
 
     /// <summary>
     /// Mantém um loop no jogo de tetris até que um certo
-    /// número de peças sejam usadas.
+    /// número de peças seja usado.
     /// </summary>
     private class LoopTetris: CustomYieldInstruction
     {
@@ -92,8 +86,6 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     private class CriaBacteria : CustomYieldInstruction
     {
-        GameManager gameManager;
-
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
         int nivel;
@@ -115,7 +107,6 @@ public class GameManager : MonoBehaviour {
 
         public CriaBacteria(GameManager gameManager, TipoBacteria tipoBacteria, float tempo)
         {
-            this.gameManager = gameManager;
             this.tempo = tempo;
             tempoInicial = Time.realtimeSinceStartup;
 
@@ -135,8 +126,6 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     private class CriaLinhaBacteria : CustomYieldInstruction
     {
-        GameManager gameManager;
-
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
         int nivel;
@@ -158,7 +147,6 @@ public class GameManager : MonoBehaviour {
 
         public CriaLinhaBacteria(GameManager gameManager, TipoBacteria tipoBacteria, float tempo)
         {
-            this.gameManager = gameManager;
             this.tempo = tempo;
             tempoInicial = Time.realtimeSinceStartup;
 
@@ -178,8 +166,6 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     private class InfectaPecas : CustomYieldInstruction
     {
-        GameManager gameManager;
-
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
         int nivel;
@@ -201,7 +187,6 @@ public class GameManager : MonoBehaviour {
 
         public InfectaPecas(GameManager gameManager, float tempo)
         {
-            this.gameManager = gameManager;
             this.tempo = tempo;
             tempoInicial = Time.realtimeSinceStartup;
 
@@ -210,16 +195,47 @@ public class GameManager : MonoBehaviour {
     }
 
     /// <summary>
+    /// Yield instruction que enfraquece as bactérias especificadas.
+    /// Importante: não espera as animações de eliminação/queda de linhas para continuar
+    /// com a sequência
+    /// </summary>
+    private class EnfraqueceBacterias : CustomYieldInstruction
+    {
+        float tempo;    //tempo que a yield instruction irá durar
+        float tempoInicial; //momento em que a yield instruction é criada
+        int nivel;
+
+        public override bool keepWaiting
+        {
+            get
+            {
+                if (Time.realtimeSinceStartup - tempoInicial >= tempo)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        public EnfraqueceBacterias(GameManager gameManager, TipoBacteria tipoBacteria, float tempo)
+        {
+            this.tempo = tempo;
+            tempoInicial = Time.realtimeSinceStartup;
+
+            gameManager.grade.EnfraqueceBacterias(tipoBacteria);
+        }
+    }
+
+    /// <summary>
     /// Yield instruction que envia uma mensagem na tela do chat.
     /// </summary>
     private class EnviaMensagem : CustomYieldInstruction
     {
-        GameManager gameManager;
-
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
-        TipoDeTexto tipo;
-        string mensagem;
 
         public override bool keepWaiting
         {
@@ -238,10 +254,7 @@ public class GameManager : MonoBehaviour {
 
         public EnviaMensagem(GameManager gameManager, float tempo, TipoDeTexto tipo, string mensagem)
         {
-            this.gameManager = gameManager;
             this.tempo = tempo;
-            this.tipo = tipo;
-            this.mensagem = mensagem;
             tempoInicial = Time.time;
 
 			gameManager.caixaDeDialogo.ImprimeTexto(tipo, mensagem);
@@ -253,8 +266,6 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     private class RegulaMedidor: CustomYieldInstruction
     {
-        GameManager gameManager;
-
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
         float nivel;
@@ -276,7 +287,6 @@ public class GameManager : MonoBehaviour {
 
         public RegulaMedidor(GameManager gameManager, float tempo, float nivel)
         {
-            this.gameManager = gameManager;
             this.tempo = tempo;
             this.nivel = nivel;
             tempoInicial = Time.time;
@@ -291,8 +301,10 @@ public class GameManager : MonoBehaviour {
     private IEnumerator SequenciaJogo()
     {
         yield return new LoopTetris(this, 5);
-        yield return new CriaLinhaBacteria(this, TipoBacteria.Normal, 1);
-        yield return new RegulaMedidor(this, 1, 1);
+        yield return new CriaLinhaBacteria(this, TipoBacteria.Normal, 1.5f);
+        yield return new CriaLinhaBacteria(this, TipoBacteria.SuperBacteria, 1.5f);
+        yield return new RegulaMedidor(this, 1, 2.5f);
+        yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 1.5f);
         yield return new LoopTetris(this, 5);
         yield return new InfectaPecas(this, 1);
         yield return new InfectaPecas(this, 1);

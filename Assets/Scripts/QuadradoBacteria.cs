@@ -10,9 +10,12 @@ public enum TipoBacteria
 
 public class QuadradoBacteria : Quadrado {
 
-
     public TipoBacteria tipoBacteria = TipoBacteria.Normal;
+
+    public bool bacteriaEnfraquecida = false;  //diz se bacteria pode ser eliminada
+
     public Sprite spriteSuperBacteria;
+    public Sprite spriteBacteriaEnfraquecida;
 
     /// <summary>
     /// Desce bactéria em dada coluna até ela encontrar um compartimento da grade já ocupado.
@@ -88,20 +91,25 @@ public class QuadradoBacteria : Quadrado {
     }
 
     /// <summary>
-    /// Transforma peças adjacentes à bactéria em bactérias
+    /// Transforma peças adjacentes à bactéria em bactérias.
+    /// Só funciona se bactéria não estiver enfraquecida
     /// </summary>
     /// <returns></returns>
     public void TransformaAdjacentes()
     {
-        Vector2Int esquerda = posicao + new Vector2Int(0, -1);
-        Vector2Int direita = posicao + new Vector2Int(0, 1);
-        Vector2Int baixo = posicao + new Vector2Int(1, 0);
-        Vector2Int cima = posicao + new Vector2Int(-1, 0);
+        //se bactéria não estiver enfraquecida
+        if (!bacteriaEnfraquecida)
+        {
+            Vector2Int esquerda = posicao + new Vector2Int(0, -1);
+            Vector2Int direita = posicao + new Vector2Int(0, 1);
+            Vector2Int baixo = posicao + new Vector2Int(1, 0);
+            Vector2Int cima = posicao + new Vector2Int(-1, 0);
 
-        if (SubstituiPeca(direita)) return;
-        else if (SubstituiPeca(esquerda)) return;
-        else if (SubstituiPeca(cima)) return;
-        else SubstituiPeca(baixo);
+            if (SubstituiPeca(direita)) return;
+            else if (SubstituiPeca(esquerda)) return;
+            else if (SubstituiPeca(cima)) return;
+            else SubstituiPeca(baixo);
+        }
     }
 
     /// <summary>
@@ -190,5 +198,14 @@ public class QuadradoBacteria : Quadrado {
     {
         GetComponent<SpriteRenderer>().sprite = spriteSuperBacteria;
         tipoBacteria = TipoBacteria.SuperBacteria;
+    }
+
+    /// <summary>
+    /// Indica que bacteria pode ser apagado e muda sprite da mesma
+    /// </summary>
+    public void EnfraqueceBacteria()
+    {
+        GetComponent<SpriteRenderer>().sprite = spriteBacteriaEnfraquecida;
+        bacteriaEnfraquecida = true;
     }
 }
