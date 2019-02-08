@@ -362,8 +362,9 @@ public class Grade : MonoBehaviour {
     /// <summary>
     /// Faz com que determinadas bactérias possam ser eliminadas e
     /// apaga linhas que tenham se tornado completas.
+    /// Retorna 'true' se alguma linha for apagada.
     /// </summary>
-    public void EnfraqueceBacterias(TipoBacteria tipoBacteria)
+    public bool EnfraqueceBacterias(TipoBacteria tipoBacteria)
     {
         //transforma bactérias
         for(int linha = 0; linha < linhas; linha++)
@@ -411,6 +412,8 @@ public class Grade : MonoBehaviour {
         sequenciaDesce.Pause();
 
         sequenciaFade.Play();
+
+        return naoApagadas < linhas;
     }
 
     //código temporário para testes

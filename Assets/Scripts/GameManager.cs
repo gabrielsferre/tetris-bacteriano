@@ -203,13 +203,14 @@ public class GameManager : MonoBehaviour {
     {
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
+        float tempoAdicional = 1.5f; //tempo acrescido para esperar a animação das linhas descendo
         int nivel;
 
         public override bool keepWaiting
         {
             get
             {
-                if (Time.realtimeSinceStartup - tempoInicial >= tempo)
+                if (Time.realtimeSinceStartup - tempoInicial >= tempo + tempoAdicional)
                 {
                     return false;
                 }
@@ -225,7 +226,7 @@ public class GameManager : MonoBehaviour {
             this.tempo = tempo;
             tempoInicial = Time.realtimeSinceStartup;
 
-            gameManager.grade.EnfraqueceBacterias(tipoBacteria);
+            tempoAdicional = gameManager.grade.EnfraqueceBacterias(tipoBacteria) ? tempoAdicional : 0;
         }
     }
 
@@ -268,7 +269,6 @@ public class GameManager : MonoBehaviour {
     {
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
-        float nivel;
 
         public override bool keepWaiting
         {
@@ -288,7 +288,6 @@ public class GameManager : MonoBehaviour {
         public RegulaMedidor(GameManager gameManager, float tempo, float nivel)
         {
             this.tempo = tempo;
-            this.nivel = nivel;
             tempoInicial = Time.time;
 
 			gameManager.medidor.Quantidade = nivel;
@@ -302,9 +301,9 @@ public class GameManager : MonoBehaviour {
     {
         yield return new LoopTetris(this, 5);
         yield return new CriaLinhaBacteria(this, TipoBacteria.Normal, 1.5f);
-        yield return new CriaLinhaBacteria(this, TipoBacteria.SuperBacteria, 1.5f);
+        yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1.5f);
         yield return new RegulaMedidor(this, 1, 2.5f);
-        yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 1.5f);
+        yield return new EnfraqueceBacterias(this, TipoBacteria.SuperBacteria, 0);
         yield return new LoopTetris(this, 5);
         yield return new InfectaPecas(this, 1);
         yield return new InfectaPecas(this, 1);
