@@ -43,6 +43,8 @@ public class GameManager : MonoBehaviour {
     {
         yield return new WaitForSeconds(spawnDelay);
 
+        medidor.AdicionarRemedio(-0.05f);
+
         numeroPecas--;
 
         if (numeroPecas > -1)
@@ -75,9 +77,10 @@ public class GameManager : MonoBehaviour {
         /// <param name="numeroPecas"></param>
         public LoopTetris(GameManager gameManager, int numeroPecas)
         {
+            this.gameManager = gameManager;
+
             gameManager.numeroPecas = numeroPecas;
             gameManager.StartCoroutine(gameManager.SegueLoopTetris());
-            this.gameManager = gameManager;
         }
     }
 
