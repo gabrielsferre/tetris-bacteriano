@@ -45,6 +45,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posicao: {x: 0, y: 0}
+  tipoBacteria: 0
+  bacteriaEnfraquecida: 0
+  spriteSuperBacteria: {fileID: 21300000, guid: c3d907b26f051b643a72487063c883c7,
+    type: 3}
+  spriteBacteriaEnfraquecida: {fileID: 21300000, guid: 6d3fcdbb9d28ae54f8f7de1106d55c15,
+    type: 3}
 --- !u!212 &212360406509121146
 SpriteRenderer:
   m_ObjectHideFlags: 0
