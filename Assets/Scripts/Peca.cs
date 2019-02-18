@@ -15,7 +15,7 @@ public class Peca : MonoBehaviour {
     public const float tempoSlide = 0.05f;
 
     //delay para o slide começar
-    public const float slideDelay = 0.5f;
+    public const float slideDelay = 0.3f;
 
     //array com quadrados que compõe a peca
     public QuadradoPeca[] quadrados = new QuadradoPeca[4];
