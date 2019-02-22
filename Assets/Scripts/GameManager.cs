@@ -20,13 +20,19 @@ public class GameManager : MonoBehaviour {
 
 	public MedidorDeRemedio medidor;
 
+    public MeshRelogio relogio;
+
+    private float incrementoRelogio = 0;    //quanto o relógio vai ser incrementado a cada peça posicionada
+    private float incrementoMedidor = -0.05f;    //quanto o medidor vai ser incrementado a cada peça posicionada
+
     private void Awake()
     {
-        //inicialização de componentes
+        //inicializações
         spawn = new SpawnPecas();
         grade = FindObjectOfType<Grade>();
         caixaDeDialogo = FindObjectOfType<CaixaDeDialogo>();
         medidor = FindObjectOfType<MedidorDeRemedio>();
+        relogio = FindObjectOfType<MeshRelogio>();
         grade.spawn = spawn;
     }
 
@@ -43,7 +49,8 @@ public class GameManager : MonoBehaviour {
     {
         yield return new WaitForSeconds(spawnDelay);
 
-        medidor.AdicionarRemedio(-0.05f);
+        medidor.AdicionarRemedio(incrementoMedidor);
+        relogio.Incrementa(incrementoRelogio);
 
         numeroPecas--;
 
@@ -298,6 +305,70 @@ public class GameManager : MonoBehaviour {
     }
 
     /// <summary>
+    /// Yield instruction que inicia a contagem do relógio
+    /// </summary>
+    private class IniciaRelogio : CustomYieldInstruction
+    {
+        float tempo;    //tempo que a yield instruction irá durar
+        float tempoInicial; //momento em que a yield instruction é criada
+
+        public override bool keepWaiting
+        {
+            get
+            {
+                if (Time.time - tempoInicial >= tempo)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        public IniciaRelogio(GameManager gameManager, float tempo, float incremento)
+        {
+            this.tempo = tempo;
+            tempoInicial = Time.time;
+
+            gameManager.incrementoRelogio = incremento;
+        }
+    }
+
+    /// <summary>
+    /// Yield instruction que zera a contagem do relógio
+    /// </summary>
+    private class ZeraRelogio : CustomYieldInstruction
+    {
+        float tempo;    //tempo que a yield instruction irá durar
+        float tempoInicial; //momento em que a yield instruction é criada
+
+        public override bool keepWaiting
+        {
+            get
+            {
+                if (Time.time - tempoInicial >= tempo)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        public ZeraRelogio(GameManager gameManager, float tempo)
+        {
+            this.tempo = tempo;
+            tempoInicial = Time.time;
+            
+            gameManager.relogio.Zera();
+        }
+    }
+
+    /// <summary>
     /// Controla a ordem dos acontecimentos no jogo
     /// </summary>
     private IEnumerator SequenciaJogo()
@@ -306,11 +377,12 @@ public class GameManager : MonoBehaviour {
         yield return new CriaLinhaBacteria(this, TipoBacteria.Normal, 1.5f);
         yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1.5f);
         yield return new RegulaMedidor(this, 1, 2.5f);
+        yield return new IniciaRelogio(this, 0, 0.01f);
         yield return new EnfraqueceBacterias(this, TipoBacteria.SuperBacteria, 0);
         yield return new LoopTetris(this, 5);
+        yield return new CriaBacteria(this, TipoBacteria.Normal, 1);
+        yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1);
         yield return new InfectaPecas(this, 1);
-        yield return new InfectaPecas(this, 1);
-        yield return new InfectaPecas(this, 1);
-
+        yield return new LoopTetris(this, 10);
     }
 }
