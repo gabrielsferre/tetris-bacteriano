@@ -95,7 +95,6 @@ public class MeshRelogio : MonoBehaviour
         //Ponteiro
         pointer.transform.eulerAngles = new Vector3(0, 0, 90);
 
-        StartCoroutine(Teste());
     }
 
     /// <summary>
@@ -114,18 +113,20 @@ public class MeshRelogio : MonoBehaviour
         PointerPosition = 0;
     }
 
-    //Properties
+    //Propriedades
 
     public Color MColorBackground
     {
         get { return mColorBackground; }
         set { mColorBackground = value; }
     }
+
     public Color MColorFill
     {
         get { return mColorFill; }
         set { mColorFill = value; }
     }
+
     public float PointerPosition
     {
         get { return pointerPosition; }
@@ -145,7 +146,7 @@ public class MeshRelogio : MonoBehaviour
                 int index_circ1 = 3 * i + 1;    //vértice na circunferência
                 int index_circ2 = 3 * i + 2;    //vértice na circunferência
 
-                //seleciona cor
+                //preenche subdivisão
                 mColors[index_centro] = mColorFill;
                 mColors[index_circ1] = mColorFill;
                 mColors[index_circ2] = mColorFill;
@@ -155,15 +156,6 @@ public class MeshRelogio : MonoBehaviour
 
             pointer.transform.eulerAngles = new Vector3(0, 0, -360 * value + 90);
             //negativo por causa do sentido horário e +90 pois o relógio começa com o ponteiro para cima
-        }
-    }
-
-    IEnumerator Teste()
-    {
-        while( PointerPosition < 1 )
-        {
-            Incrementa(0.05f);
-            yield return new WaitForSeconds(1);
         }
     }
 }
