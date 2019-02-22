@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerKeys : MonoBehaviour {
 
@@ -9,43 +10,67 @@ public class PlayerKeys : MonoBehaviour {
     public KeyCode baixo;
     public KeyCode cima;
 
-	public int GetRawVertical()
-    {
-        if(Input.GetKeyDown(cima)) return 1;
-        if (Input.GetKeyDown(baixo)) return -1;
-        return 0;
-    }
+    public Button bDireita;
+    public Button bEsquerda;
+    public Button bRotacao;
+    public Button bBaixo;
 
-    public int GetRawHorizontal()
-    {
-        if (Input.GetKeyDown(direita)) return 1;
-        if (Input.GetKeyDown(esquerda)) return -1;
-        return 0;
-    }
+    private BotaoSeta scriptDireita;
+    private BotaoSeta scriptEsquerda;
+    private BotaoSeta scriptBaixo;
+    private BotaoSeta scriptRotacao;
 
-    public bool GetDown()
+    private void Awake()
     {
-        return Input.GetKey(baixo);
-    }
-
-    public bool GetLeft()
-    {
-        return Input.GetKey(esquerda);
+        scriptDireita = bDireita.GetComponent<BotaoSeta>();
+        scriptEsquerda = bEsquerda.GetComponent<BotaoSeta>();
+        scriptBaixo = bBaixo.GetComponent<BotaoSeta>();
+        scriptRotacao = bRotacao.GetComponent<BotaoSeta>();
     }
 
     public bool GetRight()
     {
-        return Input.GetKey(direita);
+        return Input.GetKey(direita) || scriptDireita.Segurado;
+    }
+
+    public bool GetLeft()
+    {
+        return Input.GetKey(esquerda) || scriptEsquerda.Segurado;
+    }
+
+    public bool GetDown()
+    {
+        return Input.GetKey(baixo) || scriptBaixo.Segurado;
+    }
+
+    public bool GetUpPressed()
+    {
+        return Input.GetKeyDown(cima) || scriptRotacao.Pressionado;
+    }
+
+    public bool GetDownPressed()
+    {
+        return Input.GetKeyDown(baixo) || scriptBaixo.Pressionado;
+    }
+
+    public bool GetLeftPressed()
+    {
+        return Input.GetKeyDown(esquerda) || scriptEsquerda.Pressionado;
+    }
+
+    public bool GetRightPressed()
+    {
+        return Input.GetKeyDown(direita) || scriptDireita.Pressionado;
     }
 
     public bool GetLeftReleased()
     {
-        return Input.GetKeyUp(esquerda);
+        return Input.GetKeyUp(esquerda) || scriptEsquerda.Solto;
     }
 
     public bool GetRightReleased()
     {
-        return Input.GetKeyUp(direita);
+        return Input.GetKeyUp(direita) || scriptDireita.Solto;
     }
 
     //código temporário para testes

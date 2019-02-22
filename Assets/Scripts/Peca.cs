@@ -336,57 +336,28 @@ public class Peca : MonoBehaviour {
         return true;
     }
 
-    /// <summary>
-    /// Faz com que a aceleração da queda seja instantânea ao se pressionar
-    /// o botão de descida.
-    /// </summary>
-    /// <returns></returns>
-    private void DownPressed()
-    {
-        StopCoroutine("DescePeca");
-        StartCoroutine("DescePeca");
-    }
-
-    /// <summary>
-    /// Move peça para a esquerda e garante que não vá se mover
-    /// para a direita.
-    /// </summary>
-    private void LeftPressed()
-    {
-        MoveEsquerda();
-        StartCoroutine("SlideEsquerda");
-        StopCoroutine("SlideDireita");
-    }
-
-
-    /// <summary>
-    /// Move peça para a direita e garante que não vá se mover
-    /// para a esquerda.
-    /// </summary>
-    private void RightPressed()
-    {
-        MoveDireita();
-        StartCoroutine("SlideDireita");
-        StopCoroutine("SlideEsquerda");
-    }
-
     private void HandleInput()
     {
-        if( playerKeys.GetRawHorizontal() == 1)
+        if( playerKeys.GetRightPressed() )
         {
-            RightPressed();
+            MoveDireita();
+            StartCoroutine("SlideDireita");
+            StopCoroutine("SlideEsquerda");
         }
-        else if( playerKeys.GetRawHorizontal() == -1)
+        else if( playerKeys.GetLeftPressed() )
         {
-            LeftPressed();
+            MoveEsquerda();
+            StartCoroutine("SlideEsquerda");
+            StopCoroutine("SlideDireita");
         }
-        else if( playerKeys.GetRawVertical() == 1)
+        else if( playerKeys.GetUpPressed() )
         {
             GiraPeca();
         }
-        else if (playerKeys.GetRawVertical() == -1)
+        else if (playerKeys.GetDownPressed() )
         {
-            DownPressed();
+            StopCoroutine("DescePeca");
+            StartCoroutine("DescePeca");
         }
         else if (playerKeys.GetLeftReleased())
         {
