@@ -25,7 +25,7 @@ public class Peca : MonoBehaviour {
     public Vector2Int centro = new Vector2Int();
 
     //linha e coluna de surgimento do centro da peca
-    protected Vector2Int posicaoSurgimento = new Vector2Int(2,4);
+    private static Vector2Int posicaoSurgimento = new Vector2Int(2,4);
 
     protected Grade grade;
 
@@ -367,5 +367,12 @@ public class Peca : MonoBehaviour {
         {
             StopCoroutine("SlideDireita");
         }
+    }
+
+    //Propriedades
+    public static Vector2Int PosicaoSurgimento
+    {
+        get { return posicaoSurgimento; }
+        private set { posicaoSurgimento = value; }
     }
 }

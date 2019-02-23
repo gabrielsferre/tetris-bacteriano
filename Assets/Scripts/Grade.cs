@@ -10,6 +10,9 @@ public class Grade : MonoBehaviour {
     public const int linhas = 20;
     public const int colunas = 10;
 
+    private const int numLinhasApagadasSpawn = 4; //numero de linhas apagadas quando o spaw for sobrepor peças
+    private const float tempoSpawnSobreposto = 2f; //tempo de espera para as linhas apagarem quando o spawn for sobrepor peças
+
     //delay entre bacterias serem enfraquecidas e elas poderem apagar
     public const float delayEnfraquecimento = 1f;
 
@@ -116,7 +119,7 @@ public class Grade : MonoBehaviour {
         {
             if (LinhaCompleta(i))
             {
-                int iNotClosure = i;    //variável para driblar o closure ao usar ApagaLinha na expressão labda
+                int iNotClosure = i;    //variável para driblar o closure ao usar ApagaLinha na expressão lambda
 
                 //cria sequencia para animar as peças sumindo
                 Sequence novaSequencia = Efeitos.FadeLinha(quadrados[iNotClosure]);
@@ -151,6 +154,27 @@ public class Grade : MonoBehaviour {
         }
 
         return naoApagadas;
+    }
+
+    /// <summary>
+    /// Apaga 'numLinhasApagadas' linhas na base da grade.
+    /// </summary>
+    /// <returns></returns>
+    private void ApagaLinhasDeBaixo(int numLinhasApagadas, Sequence sequenciaFade, Sequence sequenciaDesce, List<Action> listaMetodos)
+    {
+        //apaga linhas que estiverem completas
+        for (int i = linhas-numLinhasApagadas; i < linhas; i++)
+        {
+            int iNotClosure = i;    //variável para driblar o closure ao usar ApagaLinha na expressão lambda
+
+            //cria sequencia para animar as peças sumindo
+            Sequence novaSequencia = Efeitos.FadeLinha(quadrados[iNotClosure]);
+            //adiciona sequencia na sequencia com todas as animações de peças sumindo
+            sequenciaFade.Insert(0, novaSequencia);
+
+            //adiciona na lista método que apaga as peças quando a sequencia acabar
+            listaMetodos.Add(() => ApagaLinha(iNotClosure));
+        }
     }
 
     /// <summary>
@@ -291,11 +315,57 @@ public class Grade : MonoBehaviour {
     /// <summary>
     /// Instancia a próxima peça da fila
     /// </summary>
-    public void CriaPeca()
-    {   
+    public IEnumerator CriaPeca()
+    {
+        //para se a peça for spawnar em cima de outra peça
+        for(int linha = 0; linha < Peca.PosicaoSurgimento.x + 1; linha++)
+        {
+            bool breakFlag = false;
+
+            for(int coluna = Peca.PosicaoSurgimento.y - 1; coluna < Peca.PosicaoSurgimento.y + 3; coluna++)
+            {
+                if(quadrados[linha][coluna].interior != Preenchimento.Livre)
+                {
+                    Sequence sequenciaFade = DOTween.Sequence();    //sequencia usada para dar o fade nas linhas apagadas
+                    Sequence sequenciaDesce = DOTween.Sequence();   //sequencia usada para fazer as linhas caírem
+
+                    //Fila de métodos que serão executados após fim das animações de queda das peças
+                    //São métodos que apagam as peças que devem ser pagadas e descem as peças que devem cair
+                    List<Action> listaMetodos = new List<Action>();
+
+                    //começa animação de queda das peças depois que as linhas completas desaparecerem
+                    sequenciaFade.OnComplete(() => sequenciaDesce.Play());
+
+                    //executa métodos da fila após fim da animação de queda
+                    sequenciaDesce.OnComplete(() => listaMetodos.ForEach(action => action()));
+
+                    //apaga linhas que foram completadas pela peça
+                    ApagaLinhasDeBaixo(numLinhasApagadasSpawn, sequenciaFade, sequenciaDesce, listaMetodos); //número de linhas que não foram apagadas
+
+                    //desce as linhas que estão em cima das peças apagadas
+                    DesceLinhas(linhas - 1, linhas - numLinhasApagadasSpawn, sequenciaDesce, listaMetodos);
+
+                    sequenciaFade.Pause();
+                    sequenciaDesce.Pause();
+
+                    sequenciaFade.Play();
+                    
+                    yield return new WaitForSeconds(tempoSpawnSobreposto);
+
+                    breakFlag = true;
+
+                    break;
+                }
+                if (breakFlag) break;
+            }
+        }
+
+        //spawn normal
         TipoPeca tipo = spawn.ProximaPeca();
         //TipoPeca tipo = TipoPeca.I;
         Instantiate(prefabs[(int)tipo], transform);
+
+        yield break;
     }
 
     /// <summary>
@@ -364,7 +434,7 @@ public class Grade : MonoBehaviour {
     /// apaga linhas que tenham se tornado completas.
     /// Retorna 'true' se alguma linha for apagada.
     /// </summary>
-    public bool EnfraqueceBacterias(TipoBacteria tipoBacteria)
+    public IEnumerator EnfraqueceBacterias(TipoBacteria tipoBacteria)
     {
         //transforma bactérias
         for(int linha = 0; linha < linhas; linha++)
@@ -386,6 +456,8 @@ public class Grade : MonoBehaviour {
                 }
             }
         }
+
+        yield return new WaitForSeconds(GameManager.tempoDeEnfraquecimento);
 
         //completa linhas
 
@@ -412,12 +484,10 @@ public class Grade : MonoBehaviour {
         sequenciaDesce.Pause();
 
         sequenciaFade.Play();
-
-        return naoApagadas < linhas;
     }
 
-    //código temporário para testes
-    private void HandleInput()
+        //código temporário para testes
+        private void HandleInput()
     {
         PlayerKeys playerKeys = GetComponent<PlayerKeys>();
 

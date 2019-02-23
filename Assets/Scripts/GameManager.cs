@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour {
 
     //Constantes
     const float spawnDelay = 0.2f; //delay para o spawn de uma peça
+    public const float tempoDeEnfraquecimento = 1.5f; //tempo que leva para a bactéria se enfraquecer
 
     //Grade onde ficam as peças
     private Grade grade;
@@ -55,8 +56,8 @@ public class GameManager : MonoBehaviour {
         numeroPecas--;
 
         if (numeroPecas > -1)
-        {
-            grade.CriaPeca();
+        {   
+            yield return StartCoroutine(grade.CriaPeca());
         }
     }
 
@@ -213,14 +214,13 @@ public class GameManager : MonoBehaviour {
     {
         float tempo;    //tempo que a yield instruction irá durar
         float tempoInicial; //momento em que a yield instruction é criada
-        float tempoAdicional = 1.5f; //tempo acrescido para esperar a animação das linhas descendo
-        int nivel;
+        float tempoDescida = 1.5f; //tempo adicional para linhas completar descerem
 
         public override bool keepWaiting
         {
             get
             {
-                if (Time.realtimeSinceStartup - tempoInicial >= tempo + tempoAdicional)
+                if (Time.realtimeSinceStartup - tempoInicial >= tempo + tempoDeEnfraquecimento + tempoDescida)
                 {
                     return false;
                 }
@@ -236,7 +236,7 @@ public class GameManager : MonoBehaviour {
             this.tempo = tempo;
             tempoInicial = Time.realtimeSinceStartup;
 
-            tempoAdicional = gameManager.grade.EnfraqueceBacterias(tipoBacteria) ? tempoAdicional : 0;
+            gameManager.StartCoroutine(gameManager.grade.EnfraqueceBacterias(tipoBacteria));
         }
     }
 
@@ -365,6 +365,7 @@ public class GameManager : MonoBehaviour {
             tempoInicial = Time.time;
             
             gameManager.relogio.Zera();
+            gameManager.incrementoRelogio = 0;
         }
     }
 
@@ -374,15 +375,28 @@ public class GameManager : MonoBehaviour {
     private IEnumerator SequenciaJogo()
     {
         yield return new LoopTetris(this, 5);
+        yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "chuva de bactéria!");
+        yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "ai droga");
         yield return new CriaLinhaBacteria(this, TipoBacteria.Normal, 1.5f);
         yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1.5f);
-        yield return new RegulaMedidor(this, 1, 2.5f);
+        yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "tomando remédio");
+        yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "relógio do remédio iniciado");
+        yield return new RegulaMedidor(this, 3, 2.5f);
         yield return new IniciaRelogio(this, 0, 0.01f);
-        yield return new EnfraqueceBacterias(this, TipoBacteria.SuperBacteria, 0);
         yield return new LoopTetris(this, 5);
+        yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "enfraquecendo bactérias");
+        yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2);
+        yield return new LoopTetris(this, 3);
         yield return new CriaBacteria(this, TipoBacteria.Normal, 1);
         yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1);
-        yield return new InfectaPecas(this, 1);
+        yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "bactérias se multiplicando");
+        yield return new InfectaPecas(this, 0.5f);
+        yield return new InfectaPecas(this, 0.5f);
+        yield return new InfectaPecas(this, 2);
         yield return new LoopTetris(this, 10);
+        yield return new EnfraqueceBacterias(this, TipoBacteria.SuperBacteria, 2);
+        yield return new LoopTetris(this, 5);
+        yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "fim");
+
     }
 }
