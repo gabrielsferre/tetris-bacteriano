@@ -477,10 +477,6 @@ public class Grade : MonoBehaviour {
         //executa métodos da fila após fim da animação de queda
         sequenciaDesce.OnComplete(() => listaMetodos.ForEach(action => action()));
 
-        //apaga linhas completas
-        int naoApagadas = ApagaCompletasDesceIncompletas(0, linhas-1, sequenciaFade, sequenciaDesce, listaMetodos); //número de linhas que não foram apagadas
-   
-
         sequenciaFade.Pause();
         sequenciaDesce.Pause();
 
