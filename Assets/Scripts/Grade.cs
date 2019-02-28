@@ -114,6 +114,9 @@ public class Grade : MonoBehaviour {
 
         int naoApagadas = 0;  //número de linhas que não puderam ser apagadas
 
+        List<Action> apagaLinhas = new List<Action>();
+        List<Action> desceLinhas = new List<Action>();
+
         //apaga linhas que estiverem completas
         for( int i = linhaMax; i >= linhaMin; i--)
         {
@@ -127,31 +130,31 @@ public class Grade : MonoBehaviour {
                 sequenciaFade.Insert(0, novaSequencia);
 
                 //adiciona na lista método que apaga as peças quando a sequencia acabar
-                listaMetodos.Add(() => ApagaLinha(iNotClosure));
+                apagaLinhas.Add(() => ApagaLinha(iNotClosure));
             }
             else
             {
-                //caso alguma linha embaixo tenha sido apagada
-                //garante que a animação só seja feita se a linha realmente for cair
-                if (naoApagadas != i)
-                {
-                    int iNotClosure = i;    //variável para driblar o closure
-                    int naoApagadasNotClosure = naoApagadas;    //variável para driblar o closure
+                int iNotClosure = i;    //variável para driblar o closure
+                int naoApagadasNotClosure = naoApagadas;    //variável para driblar o closure
 
-                    //cria sequencia para animar queda da linha
-                    Sequence novaSequencia = Efeitos.MoveLinha(quadrados[iNotClosure], quadrados[linhaMax - naoApagadas]);
-                    //adiciona sequencia na sequencia com todas as animações de queda
-                    sequenciaDesce.Insert(0, novaSequencia);
+                //cria sequencia para animar queda da linha
+                Sequence novaSequencia = Efeitos.MoveLinha(quadrados[iNotClosure], quadrados[linhaMax - naoApagadas]);
+                    
+                //adiciona sequencia na sequencia com todas as animações de queda
+                sequenciaDesce.Insert(0, novaSequencia);
 
-                    //sem esse comando a sequencia para de funcionar misteriosamente
-                    novaSequencia.OnComplete(() => { });
+                //sem esse comando a sequencia para de funcionar misteriosamente
+                novaSequencia.OnComplete(() => { });
 
-                    //adiciona na lista método que move as peças
-                    listaMetodos.Add(() => MoveLinha(iNotClosure, linhaMax - naoApagadasNotClosure));
-                }
+                //adiciona na lista método que move as peças
+                desceLinhas.Add(() => MoveLinha(iNotClosure, linhaMax - naoApagadasNotClosure));
+                
                 naoApagadas++;
             }
         }
+
+        apagaLinhas.ForEach(action => listaMetodos.Add(action));
+        desceLinhas.ForEach(action => listaMetodos.Add(action));
 
         return naoApagadas;
     }
@@ -476,9 +479,7 @@ public class Grade : MonoBehaviour {
 
         //apaga linhas completas
         int naoApagadas = ApagaCompletasDesceIncompletas(0, linhas-1, sequenciaFade, sequenciaDesce, listaMetodos); //número de linhas que não foram apagadas
-
-        //desce as linhas que estão em cima das peças apagadas
-        DesceLinhas(linhas - 1 - naoApagadas, 0, sequenciaDesce, listaMetodos);
+   
 
         sequenciaFade.Pause();
         sequenciaDesce.Pause();
