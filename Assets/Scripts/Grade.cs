@@ -477,7 +477,10 @@ public class Grade : MonoBehaviour {
         //executa métodos da fila após fim da animação de queda
         sequenciaDesce.OnComplete(() => listaMetodos.ForEach(action => action()));
 
-        sequenciaFade.Pause();
+		//apaga linhas que foram completadas pelas bactérias
+		ApagaCompletasDesceIncompletas(0, linhas, sequenciaFade, sequenciaDesce, listaMetodos); //número de linhas que não foram apagadas
+
+		sequenciaFade.Pause();
         sequenciaDesce.Pause();
 
         sequenciaFade.Play();
