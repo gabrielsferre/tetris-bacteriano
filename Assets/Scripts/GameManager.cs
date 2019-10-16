@@ -398,9 +398,9 @@ public class GameManager : MonoBehaviour {
 		//yield return new LoopTetris(this, 5);
 		//yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "fim");
 
-
+		yield return new WaitForSeconds(2.5f);
 		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Explicação básica jogo");
-		yield return new LoopTetris(this, 5);
+		yield return new LoopTetris(this, 8);
 		yield return new CriaBacteria(this, TipoBacteria.Normal, 0.1f);
 		yield return new CriaBacteria(this, TipoBacteria.Normal, 1.5f);
 		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Explicação bactéria");
