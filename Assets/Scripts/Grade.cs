@@ -478,7 +478,8 @@ public class Grade : MonoBehaviour {
         sequenciaDesce.OnComplete(() => listaMetodos.ForEach(action => action()));
 
 		//apaga linhas que foram completadas pelas bactérias
-		ApagaCompletasDesceIncompletas(0, linhas, sequenciaFade, sequenciaDesce, listaMetodos); //número de linhas que não foram apagadas
+		int naoApagadas = ApagaCompletasDesceIncompletas(0, linhas - 1, sequenciaFade, sequenciaDesce, listaMetodos); //número de linhas que não foram apagadas
+		DesceLinhas(linhas - naoApagadas - 1, 0, sequenciaDesce, listaMetodos);
 
 		sequenciaFade.Pause();
         sequenciaDesce.Pause();

@@ -374,29 +374,136 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     private IEnumerator SequenciaJogo()
     {
-        yield return new LoopTetris(this, 5);
-        yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "chuva de bactéria!");
-        yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "ai droga");
-        yield return new CriaLinhaBacteria(this, TipoBacteria.Normal, 1.5f);
-        yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1.5f);
-        yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "tomando remédio");
-        yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "relógio do remédio iniciado");
-        yield return new RegulaMedidor(this, 3, 2.5f);
-        yield return new IniciaRelogio(this, 0, 0.01f);
-        yield return new LoopTetris(this, 5);
-        yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "enfraquecendo bactérias");
-        yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2);
-        yield return new LoopTetris(this, 3);
-        yield return new CriaBacteria(this, TipoBacteria.Normal, 1);
-        yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1);
-        yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "bactérias se multiplicando");
-        yield return new InfectaPecas(this, 0.5f);
-        yield return new InfectaPecas(this, 0.5f);
-        yield return new InfectaPecas(this, 2);
-        yield return new LoopTetris(this, 10);
-        yield return new EnfraqueceBacterias(this, TipoBacteria.SuperBacteria, 2);
-        yield return new LoopTetris(this, 5);
-        yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "fim");
+		//yield return new LoopTetris(this, 5);
+		//yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "chuva de bactéria!");
+		//yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "ai droga");
+		//yield return new CriaLinhaBacteria(this, TipoBacteria.Normal, 1.5f);
+		//yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1.5f);
+		//yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "tomando remédio");
+		//yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "relógio do remédio iniciado");
+		//yield return new RegulaMedidor(this, 3, 2.5f);
+		//yield return new IniciaRelogio(this, 0, 0.01f);
+		//yield return new LoopTetris(this, 5);
+		//yield return new EnviaMensagem(this, 1, TipoDeTexto.FALA, "enfraquecendo bactérias");
+		//yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2);
+		//yield return new LoopTetris(this, 3);
+		//yield return new CriaBacteria(this, TipoBacteria.Normal, 1);
+		//yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1);
+		//yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "bactérias se multiplicando");
+		//yield return new InfectaPecas(this, 0.5f);
+		//yield return new InfectaPecas(this, 0.5f);
+		//yield return new InfectaPecas(this, 2);
+		//yield return new LoopTetris(this, 10);
+		//yield return new EnfraqueceBacterias(this, TipoBacteria.SuperBacteria, 2);
+		//yield return new LoopTetris(this, 5);
+		//yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "fim");
 
-    }
+
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Explicação básica jogo");
+		yield return new LoopTetris(this, 5);
+		yield return new CriaBacteria(this, TipoBacteria.Normal, 0.1f);
+		yield return new CriaBacteria(this, TipoBacteria.Normal, 1.5f);
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Explicação bactéria");
+		yield return new LoopTetris(this, 3);
+		yield return new InfectaPecas(this, 0.5f);
+		yield return new LoopTetris(this, 3);
+		yield return new CriaBacteria(this, TipoBacteria.Normal, 0.1f);
+		yield return new CriaBacteria(this, TipoBacteria.Normal, 1.5f);
+		yield return new LoopTetris(this, 3);
+		yield return new InfectaPecas(this, 0.5f);
+
+
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Explicação remédio");
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "*TOMA REMÉDIO*");
+		yield return new RegulaMedidor(this, 3.5f, 0.8f);
+		yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2.0f);
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (medidor.Quantidade < 0.5f)
+			{
+				yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "*TOMA REMÉDIO*");
+				yield return new RegulaMedidor(this, 3.5f, 0.8f);
+			}
+
+			yield return new LoopTetris(this, 2);
+			yield return new CriaBacteria(this, TipoBacteria.Normal, 0.1f);
+			yield return new CriaBacteria(this, TipoBacteria.Normal, 0.1f);
+			yield return new CriaBacteria(this, TipoBacteria.Normal, 1.5f);
+
+			if (medidor.CheckQuantidadeMinima())
+			{
+				yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2.0f);
+			}
+			else
+			{
+				yield return new InfectaPecas(this, 0.5f);
+			}
+
+		}
+
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Você se sente melhor e não toma o remédio");
+
+		for (int i = 0; i < 4; i++)
+		{
+
+			yield return new LoopTetris(this, 2);
+
+			if (i >= 1)
+				yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 0.1f);
+			else
+				yield return new CriaBacteria(this, TipoBacteria.Normal, 0.1f);
+
+			yield return new CriaBacteria(this, TipoBacteria.Normal, 0.1f);
+			yield return new CriaBacteria(this, TipoBacteria.Normal, 1.5f);
+
+			if (medidor.CheckQuantidadeMinima())
+			{
+				yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2.0f);
+			}
+			else
+			{
+				yield return new InfectaPecas(this, 0.5f);
+			}
+
+		}
+
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Você volta a tomar remedio mas tem super bactérias agora");
+
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "*TOMA REMÉDIO*");
+		yield return new RegulaMedidor(this, 3.5f, 0.8f);
+		yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2.0f);
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Explicação superbacteria");
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (medidor.Quantidade < 0.5f)
+			{
+				yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "*TOMA REMÉDIO*");
+				yield return new RegulaMedidor(this, 3.5f, 0.8f);
+			}
+
+			yield return new LoopTetris(this, 1);			
+			yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 0.1f);
+			yield return new CriaBacteria(this, TipoBacteria.SuperBacteria, 1.5f);
+
+			if (medidor.CheckQuantidadeMinima())
+			{
+				yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2.0f);
+			}
+			else
+			{
+				yield return new InfectaPecas(this, 0.5f);
+			}
+
+		}
+
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Você Toma um remedio mais forte");
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "*TOMA REMÉDIO FORTE*");
+		yield return new RegulaMedidor(this, 3.5f, 0.8f);
+		yield return new EnfraqueceBacterias(this, TipoBacteria.SuperBacteria, 2.0f);
+
+		yield return new LoopTetris(this, 5);
+
+	}
 }

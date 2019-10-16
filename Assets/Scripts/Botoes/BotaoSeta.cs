@@ -26,10 +26,15 @@ public class BotaoSeta : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         consumirSolto = false;
     }
 
-    private void Update()
+	private void LateUpdate()
+	{
+		
+	}
+
+	private void Update()
     {
-        //faz com que 'solto' funcione como um tipo de Input.GetKeyUp()
-        if (!consumirSolto && Solto)
+		//faz com que 'solto' funcione como um tipo de Input.GetKeyUp()
+		if (!consumirSolto && Solto)
         {
             consumirSolto= true;
         }
@@ -43,7 +48,7 @@ public class BotaoSeta : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             consumirPressionado = true;
         }
-        if(consumirPressionado)
+        else if(consumirPressionado)
         {
             Pressionado = false;
         }
