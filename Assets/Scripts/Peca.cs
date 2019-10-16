@@ -50,7 +50,8 @@ public class Peca : MonoBehaviour {
         StartCoroutine("DescePeca");
     }
 
-    private void Update()
+    //precisa ser LateUpdate para não bugar os botões da UI
+    private void LateUpdate()
     {
         HandleInput();
     }

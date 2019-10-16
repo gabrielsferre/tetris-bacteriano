@@ -10,46 +10,42 @@ public class BotaoSeta : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private bool pressionado = false;   //botão foi pressionado uma vez
     private bool solto = false;     //botão foi solto
 
-    private bool soltoConsumido = true; //flag usada para 'solto' valer 'false' na hora certa
-    private bool pressionadoConsumido = true; //flag usada para 'pressionado' valer 'false' na hora certa
+    private bool consumirSolto = true; //flag usada para 'solto' valer 'false' na hora certa
+    private bool consumirPressionado = true; //flag usada para 'pressionado' valer 'false' na hora certa
 
     public void OnPointerDown(PointerEventData eventData)
     {
         Segurado = true;
-
-        if (!Pressionado)
-        {
-            Pressionado = true;
-        }
+        Pressionado = true;
+        consumirPressionado = false;
     }
     public void OnPointerUp(PointerEventData eventData)
     {
         Segurado = false;
         Solto = true;
+        consumirSolto = false;
     }
 
     private void Update()
     {
         //faz com que 'solto' funcione como um tipo de Input.GetKeyUp()
-        if (!soltoConsumido && Solto)
+        if (!consumirSolto && Solto)
+        {
+            consumirSolto= true;
+        }
+        if (consumirSolto)
         {
             Solto = false;
-            soltoConsumido = true;
-        }
-        else if (Solto)
-        {
-            soltoConsumido = false;
         }
 
         //faz com que 'pressionado' funcione como um tipo de Input.GetKeyDown()
-        if (!pressionadoConsumido && Pressionado)
+        if (!consumirPressionado && Pressionado)
+        {
+            consumirPressionado = true;
+        }
+        if(consumirPressionado)
         {
             Pressionado = false;
-            pressionadoConsumido = true;
-        }
-        else if (Pressionado)
-        {
-            pressionadoConsumido = false;
         }
     }
 
