@@ -400,8 +400,8 @@ public class GameManager : MonoBehaviour {
 		//yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "fim");
 
 		yield return new WaitForSeconds(2.5f);
-		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Olá!");
-		yield return new EnviaMensagem(this, 4, TipoDeTexto.FALA, "Nesse jogo você vai simular o funcionamento de um orgão do seu corpo");
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Olá");
+		yield return new EnviaMensagem(this, 4, TipoDeTexto.FALA, "Nesse jogo você vai simular o funcionamento de um órgão do seu corpo");
 		yield return new EnviaMensagem(this, 4, TipoDeTexto.FALA, "Forme linhas com os blocos para processá-los e garantir o bom funcionamento do organismo");
 		yield return new LoopTetris(this, 8);
 		yield return new CriaLinhaBacteria(this, TipoBacteria.Normal, 2);
@@ -417,7 +417,7 @@ public class GameManager : MonoBehaviour {
 
 		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Hum...");
 		yield return new EnviaMensagem(this, 4, TipoDeTexto.FALA, "Parece que o efeito das bactérias está começando a ser sentido pelo corpo");
-		yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "*TOMA REMÉDIO*");
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "<sprite=0> GLUP <sprite=0>");
 		yield return new RegulaMedidor(this, 3.5f, 0.8f);
 		yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2.0f);
 		yield return new EnviaMensagem(this, 4, TipoDeTexto.FALA, "Ah! Agora nosso corpo está devidamente medicado");
@@ -430,7 +430,7 @@ public class GameManager : MonoBehaviour {
 		{
 			if (medidor.Quantidade < 0.5f)
 			{
-				yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "*TOMA REMÉDIO*");
+				yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "<sprite=0> GLUP <sprite=0>");
 				yield return new RegulaMedidor(this, 3.5f, 0.8f);
 				yield return new EnfraqueceBacterias(this, TipoBacteria.Normal, 2.0f);
 			}
@@ -477,7 +477,7 @@ public class GameManager : MonoBehaviour {
 
 		}
 
-		yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "*TOMA REMÉDIO*");
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "<sprite=0> GLUP <sprite=0>");
 		yield return new RegulaMedidor(this, 3.5f, 0.8f);
 
 		yield return new EnviaMensagem(this, 2, TipoDeTexto.FALA, "Ufa!");
@@ -492,7 +492,7 @@ public class GameManager : MonoBehaviour {
 		{
 			if (medidor.Quantidade < 0.5f)
 			{
-				yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "*TOMA REMÉDIO*");
+				yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "<sprite=0> GLUP <sprite=0>");
 				yield return new RegulaMedidor(this, 3.5f, 0.8f);
 			}
 
@@ -511,9 +511,9 @@ public class GameManager : MonoBehaviour {
 
 		}
 
-		yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "*TOMA REMÉDIO FORTE*");
+		yield return new EnviaMensagem(this, 2, TipoDeTexto.RESPOSTA, "<sprite=1> GLUP <sprite=1>");
 		yield return new EnviaMensagem(this, 4, TipoDeTexto.FALA, "Ok, parece que agora a medicação foi trocada");
-		yield return new EnviaMensagem(this, 4, TipoDeTexto.FALA, "Vamos torcer para que as super-bactérias não resistam a essas também");
+		yield return new EnviaMensagem(this, 4, TipoDeTexto.FALA, "Vamos torcer para que as superbactérias não resistam a essas também");
 		yield return new RegulaMedidor(this, 3.5f, 0.8f);
 		yield return new EnfraqueceBacterias(this, TipoBacteria.SuperBacteria, 2.0f);
 
